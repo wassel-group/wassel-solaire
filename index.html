@@ -800,6 +800,7 @@ body.ar .sum-lbl { font-size:18px !important; }
 
     <button class="btn-print" onclick="printPdf()">🖨 Imprimer / Exporter PDF</button>
     <button class="btn-print" onclick="printDevis()" style="background:#15803d;margin-top:4px;" id="btn-devis">📄 Imprimer Devis</button>
+    <button class="btn-print" onclick="printDevis(null,null,true)" style="background:#c9a84c;margin-top:4px;" id="btn-devis-special">📄 Devis spécial (sans calcul)</button>
     <button class="btn-print" onclick="openSchema()" style="background:#e84c0e;margin-top:4px;" id="btn-schema">📐 Schéma de câblage</button>
     <button class="btn-print no-print" onclick="openAccessoiresDetail()" style="background:#6b21a8;margin-top:4px;" id="btn-acc-detail">📋 Détail accessoires (interne)</button>
 
@@ -2752,7 +2753,7 @@ function openAccessoiresDetail(){
       items:{ support_toiture:'Support de fixation sur toiture tôle/bac acier', crochet_liaison:'Crochet de liaison des supports (bride centrale)',
         crochet_fixation:'Crochet de fixation des panneaux (bride de fin)', vis:'Vis autoperceuse fine pour tôle 5×5×38mm',
         profile_6m:'Profilé métallique pour supports, 6m', mc4:'Connecteur MC4 (1000V/30A)', cosse:'Cosse de câble à sertir (5-6mm²)', cosse_terre:'Cosse de terre',
-        coffret_dc:'Coffret de contrôle tension DC (panneaux → onduleur), 1 groupe de strings',
+        coffret_dc:'Coffret de Parafoudre contrôle tension DC, 1 groupe de strings',
         collier_colson:'Collier Colson 400mm', vis_parker:'Vis Parker 6×1¼ (paquet)', attache_chine:'Attache Chine N°16 (paquet)',
         dc_2p:'Disjoncteur batterie DC 2 pôles, 250A, 1000V', dc_4p:'Disjoncteur batterie DC 4 pôles, 250A, 1000V',
         bornier:'Bornier batterie, 4 pôles, 400A',
@@ -2764,7 +2765,7 @@ function openAccessoiresDetail(){
         ats_tri_200:'Disjoncteur automatique (ATS) 4 pôles, 200A', ats_tri_250:'Disjoncteur automatique (ATS) 4 pôles, 250A',
         extra_mesure_num:'Appareil de mesure numérique tension/courant, 4 pôles, 100A', extra_mc4_50a:'Connecteur MC4 (1000V/50A)',
         extra_boitier_4:'Boîtier de jonction PV, 4 entrées', extra_boitier_8:'Boîtier de jonction PV, 8 entrées', extra_boitier_12:'Boîtier de jonction PV, 12 entrées',
-        extra_coffret_2g:'Coffret de contrôle DC, 2 groupes de strings',
+        extra_coffret_2g:'Coffret de Parafoudre contrôle tension DC, 2 groupes de strings',
         extra_rail_alu:'Rail aluminium premium (REMPLACE le profilé métallique standard, ne pas cumuler), 6 mètres',
         extra_goulotte:'Goulotte plastique 16×25×2m', extra_dpn32:'DPN Le Grand 32A A4500', extra_dpn16:'DPN Le Grand Original Diversifier 16C 4500A', extra_ac_num_100:'Tableau avec afficheur numérique tension/courant, 4 pôles, 100A',
         extra_cheville_embasse:'Cheville Embasse', extra_cheville_fisher:'Cheville Fisher 12',
@@ -2971,7 +2972,7 @@ function openAccessoiresDetail(){
       return `
       <tr>
         <td>${iName(it.key)}</td>
-        <td style="text-align:center;font-size:11px;color:#64748b;">${iRef(it.key)}</td>
+        <td style="text-align:center;font-size:14px;color:#64748b;">${iRef(it.key)}</td>
         <td style="text-align:center;">${it.ratio}</td>
         <td style="text-align:center;"><input type="number" min="0" step="any" value="${q}" style="width:70px;text-align:center;border:1px solid #ccc;border-radius:4px;padding:2px;" onchange="updateItemQty('${it.key}', this.value)"> ${it.unite==='pièce'?L.unite:L.unite6m}</td>
         <td style="text-align:right;">${fmt(it.pu)}</td>
@@ -3001,7 +3002,7 @@ function openAccessoiresDetail(){
       cableRow = `
       <tr>
         <td>${L.cableDcPos(d.cableGauge)}</td>
-        <td style="text-align:center;font-size:11px;color:#64748b;">${refPos}</td>
+        <td style="text-align:center;font-size:14px;color:#64748b;">${refPos}</td>
         <td style="text-align:center;">${d.distanceM} m</td>
         <td style="text-align:center;"><input type="number" min="0" step="any" value="${metresParConducteur}" style="width:70px;text-align:center;border:1px solid #ccc;border-radius:4px;padding:2px;" onchange="updateCableDistance(this.value)"> m</td>
         <td style="text-align:right;">${fmt(d.cablePu)}</td>
@@ -3009,7 +3010,7 @@ function openAccessoiresDetail(){
       </tr>
       <tr>
         <td>${L.cableDcNeg(d.cableGauge)}</td>
-        <td style="text-align:center;font-size:11px;color:#64748b;">${refNeg}</td>
+        <td style="text-align:center;font-size:14px;color:#64748b;">${refNeg}</td>
         <td style="text-align:center;">${d.distanceM} m</td>
         <td style="text-align:center;"><input type="number" min="0" step="any" value="${metresParConducteur}" style="width:70px;text-align:center;border:1px solid #ccc;border-radius:4px;padding:2px;" onchange="updateCableDistance(this.value)"> m</td>
         <td style="text-align:right;">${fmt(d.cablePu)}</td>
@@ -3027,7 +3028,7 @@ function openAccessoiresDetail(){
       cableTerreRow = `
       <tr>
         <td>${L.cableTerreLbl}</td>
-        <td style="text-align:center;font-size:11px;color:#64748b;">—</td>
+        <td style="text-align:center;font-size:14px;color:#64748b;">—</td>
         <td style="text-align:center;">${d.distanceM} m</td>
         <td style="text-align:center;"><input type="number" min="0" step="any" value="${metresTerre}" style="width:70px;text-align:center;border:1px solid #ccc;border-radius:4px;padding:2px;" onchange="updateCableTerreDistance(this.value)"> m</td>
         <td style="text-align:right;">${fmt(d.cableTerrePu)}</td>
@@ -3046,7 +3047,7 @@ function openAccessoiresDetail(){
       return `
       <tr>
         <td>${iName(it.key)}</td>
-        <td style="text-align:center;font-size:11px;color:#64748b;">${iRef(it.key)}</td>
+        <td style="text-align:center;font-size:14px;color:#64748b;">${iRef(it.key)}</td>
         <td style="text-align:center;">—</td>
         <td style="text-align:center;"><input type="number" min="0" step="1" value="${q}" style="width:70px;text-align:center;border:1px solid #ccc;border-radius:4px;padding:2px;" onchange="updateItemQty('${it.key}', this.value)"></td>
         <td style="text-align:right;">${fmt(it.pu)}</td>
@@ -3062,7 +3063,7 @@ function openAccessoiresDetail(){
       return `
       <tr>
         <td>${iName(key)}</td>
-        <td style="text-align:center;font-size:11px;color:#64748b;">${iRef(key)}</td>
+        <td style="text-align:center;font-size:14px;color:#64748b;">${iRef(key)}</td>
         <td style="text-align:center;">—</td>
         <td style="text-align:center;"><input type="number" min="0" value="${qty}" style="width:55px;text-align:center;border:1px solid #ccc;border-radius:4px;padding:2px;" onchange="updateExtraQty('${key}', this.value)"></td>
         <td style="text-align:right;">${fmt(pu)}</td>
@@ -3136,7 +3137,7 @@ function openAccessoiresDetail(){
       body[dir="rtl"] table{font-size:19px;}
       body[dir="rtl"] th{font-size:19px;padding:10px;}
       body[dir="rtl"] td{font-size:19px;padding:10px 10px;}
-      body[dir="rtl"] .note{font-size:18px;}
+      body[dir="rtl"] .note{font-size:18px;color:#000;}
       body[dir="rtl"] .langbtn{font-size:17px;}
       h1{font-size:18px;color:#0f1f4b;} h2{font-size:13px;color:#555;font-weight:normal;margin-top:0;margin-bottom:24px;}
       h3{font-size:14px;color:#0f1f4b;margin-top:28px;margin-bottom:4px;}
@@ -3168,7 +3169,7 @@ function openAccessoiresDetail(){
         body[dir="rtl"] table{font-size:14px;margin-top:1px;}
         body[dir="rtl"] th{font-size:14px;padding:2px 4px;}
         body[dir="rtl"] td{font-size:14px;padding:1px 4px;}
-        body[dir="rtl"] .note{font-size:12.5px;margin-top:4px;}
+        body[dir="rtl"] .note{font-size:12.5px;margin-top:4px;color:#000;}
       }
     </style></head><body></body></html>
   `);
@@ -3220,7 +3221,7 @@ function openAccessoiresDetail(){
   render('fr');
 }
 
-function printDevis(existingWin, langOverride){
+function printDevis(existingWin, langOverride, special){
   // ── Traductions du devis ──
   const DV = {
     fr: {
@@ -3347,7 +3348,11 @@ function printDevis(existingWin, langOverride){
     alert('Chaque onduleur présente un courant calculé de ' + Math.round(protDetail.iAvecMarge) + 'A (avec marge de 25%), supérieur au plus grand calibre d\'ATS disponible dans la liste de prix. Le devis ne chiffre pas automatiquement l\'ATS — ajoute-le manuellement.');
   }
 
-  const lignesDefaut = [
+  const lignesDefaut = special ? [
+    { desc: '', qty: 1, pu: 0, remise: 0 },
+    { desc: '', qty: 1, pu: 0, remise: 0 },
+    { desc: '', qty: 1, pu: 0, remise: 0 },
+  ] : [
     { desc: L.desc_panel+' '+wPan+'W'+(REF_PANEL[wPan] ? ' ('+REF_PANEL[wPan]+')' : ''), qty: nbPan,  pu: 41800,  remise: 0, role:'panel' },
     { desc: L.lbl_ond_prefix+' '+(ondModel||L.desc_ond)+(REF_ONDULEUR[ondModel] ? ' ('+REF_ONDULEUR[ondModel]+')' : ''),      qty: nbOnd,  pu: (window.__ondUnitPrice||450000), remise: 0, role:'onduleur' },
     { desc: L.lbl_bat_prefix+' '+(batModel||L.desc_bat),      qty: nbBat,  pu: (window.__batUnitPrice||280000), remise: 0, role:'batterie' },
@@ -3357,6 +3362,16 @@ function printDevis(existingWin, langOverride){
   ].filter(l => l.role !== 'panel' || l.qty > 0); // pas de ligne panneau si l'installation n'en a pas
   const defautParRole = {};
   lignesDefaut.forEach(d => { if(d.role) defautParRole[d.role] = d; });
+  // ── Clé de sauvegarde : un devis spécial pour un dossier N ne touche jamais le
+  // devis calculé normal du même dossier N, et inversement — deux suivis séparés
+  // mais sous le MÊME numéro de dossier, comme demandé par Farouk le 22/08/2026.
+  // ── Un seul enregistrement par dossier (STORAGE_KEY commune), qui contient
+  // à la fois le devis normal ET le devis spécial dans deux sous-champs distincts
+  // (normal / special). Le suivi de numérotation reste donc identique entre les
+  // deux types de devis (même N° Dossier), sans que l'un écrase l'autre —
+  // demandé par Farouk le 22/08/2026.
+  const STORAGE_KEY = 'wassel_devis_' + dossier;
+  const STORAGE_SUBKEY = special ? 'special' : 'normal';
   // ── Reprendre le devis précédemment modifié pour ce dossier, s'il existe ──
   // On repart de la LISTE DE LIGNES TELLE QUE L'UTILISATEUR L'AVAIT LAISSÉE
   // (donc si une ligne a été supprimée, elle reste supprimée — on ne la
@@ -3368,7 +3383,20 @@ function printDevis(existingWin, langOverride){
   let tvaExemptSaved = false;
   if(dossier){
     try {
-      const saved = JSON.parse(localStorage.getItem('wassel_devis_'+dossier) || 'null');
+      const savedRoot = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+      // Compatibilité : anciens devis sauvegardés avant cette fusion, sous l'ancien
+      // format {lignes, tvaExempt} directement (sans sous-clé normal/special).
+      let saved = savedRoot && savedRoot[STORAGE_SUBKEY] ? savedRoot[STORAGE_SUBKEY]
+                : (savedRoot && Array.isArray(savedRoot.lignes) && !special) ? savedRoot
+                : null;
+      // Compatibilité : anciens devis spéciaux sauvegardés sous l'ancienne clé séparée
+      // 'wassel_devis_special_'+dossier, avant cette fusion — récupérés une seule fois.
+      if(!saved && special){
+        try {
+          const oldSpecial = JSON.parse(localStorage.getItem('wassel_devis_special_'+dossier) || 'null');
+          if(oldSpecial && Array.isArray(oldSpecial.lignes) && oldSpecial.lignes.length) saved = oldSpecial;
+        } catch(e){}
+      }
       if(saved && Array.isArray(saved.lignes) && saved.lignes.length){
         tvaExemptSaved = !!saved.tvaExempt;
         lignes = saved.lignes.map(sv => {
@@ -3391,9 +3419,9 @@ function printDevis(existingWin, langOverride){
 
   const rows = lignes.map((l,i)=>`
     <tr id="row${i}" data-role="${l.role||''}">
-      <td><input type="text" id="desc${i}" value="${l.desc}" placeholder="${L.ph_desc}" style="width:100%;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="recalc()"></td>
+      <td><input type="text" id="desc${i}" value="${l.desc}" placeholder="${L.ph_desc}" style="width:100%;min-width:380px;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="recalc()"></td>
       <td class="num"><input type="number" id="qty${i}" value="${l.qty}" min="0" step="1" style="width:60px;text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="recalc()"></td>
-      <td class="num"><input type="text" inputmode="numeric" id="pu${i}" value="${l.pu}" style="width:110px;text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="onPuInput(this)"></td>
+      <td class="num"><input type="text" inputmode="numeric" id="pu${i}" value="${l.pu}" style="width:60px;text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="onPuInput(this)"></td>
       <td class="num"><span class="rem-wrap"><input type="number" id="rem${i}" value="${l.remise}" min="0" max="100" step="1" style="text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;" oninput="recalc()">%</span></td>
       <td class="num"><span class="tot-box" id="tot${i}">0</span></td>
       <td><button class="btn-del-line" onclick="delRow(${i})" title="X">X</button></td>
@@ -3447,7 +3475,7 @@ function printDevis(existingWin, langOverride){
   td:nth-child(4) input{display:inline-block;vertical-align:middle;}
   .rem-wrap{display:inline-flex;align-items:center;justify-content:center;gap:3px;white-space:nowrap;}
   .rem-wrap input[type=number]{width:38px !important;}
-  .tot-box{display:inline-block;min-width:64px;border:1px solid #ccc;border-radius:4px;padding:3px 8px;background:#f8f9fb;text-align:right;font-weight:600;font-size:${isRTL?'13':'11'}px;}
+  .tot-box{display:inline-block;min-width:80px;border:1px solid #ccc;border-radius:4px;padding:3px 8px;background:#f8f9fb;text-align:right;font-weight:600;font-size:${isRTL?'13':'11'}px;}
   .exo-check{display:block;margin:0 0 8px;font-size:${isRTL?'14':'12'}px;color:#0f1f4b;font-weight:600;cursor:pointer;text-align:${isRTL?'right':'left'};}
   .exo-check input{vertical-align:middle;margin-${isRTL?'left':'right'}:5px;width:14px;height:14px;cursor:pointer;}
   .totals{margin-${isRTL?'right':'left'}:auto;width:320px;border:1px solid #ddd;border-radius:8px;overflow:hidden;margin-top:8px;}
@@ -3481,7 +3509,7 @@ function printDevis(existingWin, langOverride){
 <header>
   <img src="${logoSrc}" alt="Wassel">
   <div>
-    <h1>${L.title}</h1>
+    <h1>${L.title}${special ? ' <span style="font-size:12px;background:#c9a84c;color:#0f1f4b;padding:2px 8px;border-radius:4px;vertical-align:middle;">'+(useLang==='ar'?'عرض خاص':(useLang==='en'?'SPECIAL QUOTE':'DEVIS SPÉCIAL'))+'</span>' : ''}</h1>
     <div class="sub">${L.sub}</div>
     <p>• Bl. De Gaulle – Tél : 21 35 55 55 &nbsp;|&nbsp; • Av. Brazzaville – Tél : 21 35 19 10 &nbsp;|&nbsp; • Centre Commercial Hamoudi – Tél : 21 34 99 63 &nbsp;|&nbsp; • Cité Hodan / Alrahama – Tél : 21 36 22 65</p>
     <p>✉ contact@wassel-group.com &nbsp;|&nbsp; ✉ office@wassel-group.com &nbsp;|&nbsp; 🌐 www.wassel-group.com</p>
@@ -3512,6 +3540,7 @@ function printDevis(existingWin, langOverride){
 <button class="btn-add-line no-print" onclick="addRow()">${L.btn_add}</button>
 <div class="no-print" style="margin:0 0 12px 0;">
   <label style="font-size:11px;font-weight:600;color:#334155;display:block;margin-bottom:4px;">${L.lbl_extra}</label>
+  <input type="text" id="extra-search" placeholder="🔍 Rechercher un article (ex: MC4, câble, ATS...)" oninput="filterExtraCatalog(this.value)" style="width:100%;max-width:420px;padding:6px;border:1px solid #ccc;border-radius:5px;font-size:11px;margin-bottom:6px;display:block;">
   <select id="extra-catalog" style="padding:6px;border:1px solid #ccc;border-radius:5px;font-size:11px;max-width:420px;">
     <optgroup label="Panneaux solaires">
       <option value="Panneau solaire Jinko N-Type Bifacial 720W (33060201004)|41800">Panneau Jinko N-Type Bifacial 720W — 41 800 FDJ</option>
@@ -3537,49 +3566,63 @@ function printDevis(existingWin, langOverride){
       <option value="Batterie Deye BOS-A-Pack 7.68 (33060601002)|410750">Deye BOS-A-Pack 7.68 (7.68kWh) — 410 750 FDJ</option>
       <option value="Batterie Deye BOS-G-Pack 5.1 (33060601003)|279000">Deye BOS-G-Pack 5.1 (5.12kWh) — 279 000 FDJ</option>
     </optgroup>
+    <optgroup label="Autres équipements Deye">
+      <option value="Boîtier de contrôle BOS-A-PDU-2 (33060304002)|302250">Boîtier de contrôle BOS-A-PDU-2 — 302 250 FDJ</option>
+      <option value="Boîtier de contrôle BOS-G-PDU-2 (33060304003)|240250">Boîtier de contrôle BOS-G-PDU-2 — 240 250 FDJ</option>
+      <option value="Boîtier de contrôle BOS-W-PDU-2 (33060304001)|240250">Boîtier de contrôle BOS-W-PDU-2 — 240 250 FDJ</option>
+      <option value="Boîtier de contrôle BOS-B-PDU-2 (33060304005)|511500">Boîtier de contrôle BOS-B-PDU-2 — 511 500 FDJ</option>
+      <option value="Prise électrique intelligente pour batteries solaires (33060501036)|16275">Prise intelligente DEYE SMART PLUG — 16 275 FDJ</option>
+      <option value="Dispositif sans fil pour relier l'onduleur au tableau électrique (33060501033)|23250">Wireless CT (onduleur → tableau) — 23 250 FDJ</option>
+      <option value="Chargeur de véhicule électrique 11 kW (33060501034)|93000">Chargeur véhicule électrique 11kW — 93 000 FDJ</option>
+      <option value="Chargeur de véhicule électrique 22 kW (33060501035)|116250">Chargeur véhicule électrique 22kW — 116 250 FDJ</option>
+    </optgroup>
     <optgroup label="Onduleur / Protections / PV">
-      <option value="Appareil de mesure numérique tension/courant, 4 pôles, 100A|8525">Appareil de mesure numérique 4P 100A — 8 525 FDJ</option>
-      <option value="Tableau avec afficheur numérique tension/courant, 4 pôles, 100A|27900">Tableau afficheur numérique 4P 100A — 27 900 FDJ</option>
-      <option value="Tableau avec afficheur numérique tension/courant, monophasé, 63A|27900">Tableau afficheur numérique mono 63A — 27 900 FDJ</option>
-      <option value="Disjoncteur batterie DC 2 pôles, 250A, 1000V|6510">Disjoncteur batterie DC 2P 250A — 6 510 FDJ</option>
-      <option value="Disjoncteur batterie DC 4 pôles, 250A, 1000V|11625">Disjoncteur batterie DC 4P 250A — 11 625 FDJ</option>
-      <option value="Bornier batterie, 4 pôles, 400A|5890">Bornier batterie 4P 400A — 5 890 FDJ</option>
-      <option value="Coffret de contrôle tension DC (panneaux → onduleur), 1 groupe de strings|26350">Coffret DC 1 groupe de strings — 26 350 FDJ</option>
-      <option value="Coffret de contrôle DC, 2 groupes de strings|42625">Coffret DC 2 groupes de strings — 42 625 FDJ</option>
-      <option value="Tableau AC 3 pôles, 40A|18988">Tableau AC 3P 40A — 18 988 FDJ</option>
-      <option value="Tableau AC 4 pôles, 63A|35650">Tableau AC 4P 63A — 35 650 FDJ</option>
-      <option value="Tableau AC 4 pôles, 100A|42625">Tableau AC 4P 100A — 42 625 FDJ</option>
-      <option value="Boîtier de jonction PV, 4 entrées|119350">Boîtier de jonction PV 4 entrées — 119 350 FDJ</option>
-      <option value="Boîtier de jonction PV, 8 entrées|186000">Boîtier de jonction PV 8 entrées — 186 000 FDJ</option>
-      <option value="Boîtier de jonction PV, 12 entrées|224750">Boîtier de jonction PV 12 entrées — 224 750 FDJ</option>
-      <option value="Disjoncteur automatique (ATS) 2 pôles, 40A|6510">ATS 2P 40A — 6 510 FDJ</option>
-      <option value="Disjoncteur automatique (ATS) 2 pôles, 63A|6510">ATS 2P 63A — 6 510 FDJ</option>
-      <option value="Disjoncteur automatique (ATS) 4 pôles, 63A|7750">ATS 4P 63A — 7 750 FDJ</option>
-      <option value="Disjoncteur automatique (ATS) 4 pôles, 100A|9145">ATS 4P 100A — 9 145 FDJ</option>
-      <option value="Disjoncteur automatique (ATS) 4 pôles, 125A|9610">ATS 4P 125A — 9 610 FDJ</option>
-      <option value="Disjoncteur automatique (ATS) 4 pôles, 160A|28675">ATS 4P 160A — 28 675 FDJ</option>
-      <option value="Disjoncteur automatique (ATS) 4 pôles, 200A|31775">ATS 4P 200A — 31 775 FDJ</option>
-      <option value="Disjoncteur automatique (ATS) 4 pôles, 250A|35650">ATS 4P 250A — 35 650 FDJ</option>
+      <option value="Appareil de mesure numérique tension/courant, 4 pôles, 100A (33060308003)|8525">Appareil de mesure numérique 4P 100A — 8 525 FDJ</option>
+      <option value="Tableau avec afficheur numérique tension/courant, 4 pôles, 100A (33060305004)|27900">Tableau afficheur numérique 4P 100A — 27 900 FDJ</option>
+      <option value="Tableau avec afficheur numérique tension/courant, monophasé, 63A (33060305003)|27900">Tableau afficheur numérique mono 63A — 27 900 FDJ</option>
+      <option value="Disjoncteur batterie DC 2 pôles, 250A, 1000V (33060308001)|6510">Disjoncteur batterie DC 2P 250A — 6 510 FDJ</option>
+      <option value="Disjoncteur batterie DC 4 pôles, 250A, 1000V (33060308002)|11625">Disjoncteur batterie DC 4P 250A — 11 625 FDJ</option>
+      <option value="Bornier batterie, 4 pôles, 400A (33060308004)|5890">Bornier batterie 4P 400A — 5 890 FDJ</option>
+      <option value="Coffret de Parafoudre contrôle tension DC, 1 groupe de strings (33060302001)|26350">Coffret DC 1 groupe de strings — 26 350 FDJ</option>
+      <option value="Coffret de Parafoudre contrôle tension DC, 2 groupes de strings (33060303001)|42625">Coffret DC 2 groupes de strings — 42 625 FDJ</option>
+      <option value="Tableau AC 3 pôles, 40A (33060305005)|18988">Tableau AC 3P 40A — 18 988 FDJ</option>
+      <option value="Tableau AC 4 pôles, 63A (33060305006)|35650">Tableau AC 4P 63A — 35 650 FDJ</option>
+      <option value="Tableau AC 4 pôles, 100A (33060305007)|42625">Tableau AC 4P 100A — 42 625 FDJ</option>
+      <option value="Boîtier de jonction PV, 4 entrées (33060305008)|119350">Boîtier de jonction PV 4 entrées — 119 350 FDJ</option>
+      <option value="Boîtier de jonction PV, 8 entrées (33060305009)|186000">Boîtier de jonction PV 8 entrées — 186 000 FDJ</option>
+      <option value="Boîtier de jonction PV, 12 entrées (33060305010)|224750">Boîtier de jonction PV 12 entrées — 224 750 FDJ</option>
+      <option value="Disjoncteur automatique (ATS) 2 pôles, 40A (33060307001)|6510">ATS 2P 40A — 6 510 FDJ</option>
+      <option value="Disjoncteur automatique (ATS) 2 pôles, 63A (33060307002)|6510">ATS 2P 63A — 6 510 FDJ</option>
+      <option value="Disjoncteur automatique (ATS) 4 pôles, 63A (33060307003)|7750">ATS 4P 63A — 7 750 FDJ</option>
+      <option value="Disjoncteur automatique (ATS) 4 pôles, 100A (33060307004)|9145">ATS 4P 100A — 9 145 FDJ</option>
+      <option value="Disjoncteur automatique (ATS) 4 pôles, 125A (33060307005)|9610">ATS 4P 125A — 9 610 FDJ</option>
+      <option value="Disjoncteur automatique (ATS) 4 pôles, 160A (33060307006)|28675">ATS 4P 160A — 28 675 FDJ</option>
+      <option value="Disjoncteur automatique (ATS) 4 pôles, 200A (33060307007)|31775">ATS 4P 200A — 31 775 FDJ</option>
+      <option value="Disjoncteur automatique (ATS) 4 pôles, 250A (33060307008)|35650">ATS 4P 250A — 35 650 FDJ</option>
       <option value="DPN Le Grand 32A A4500|3250">DPN Le Grand 32A — 3 250 FDJ</option>
       <option value="DPN Le Grand Original Diversifier 16C 4500A|3250">DPN Le Grand Original 16C — 3 250 FDJ</option>
+      <option value="Parafoudre Type 2 DS50PV-1000/30|28400">Parafoudre Type 2 DS50PV-1000/30 — 28 400 FDJ</option>
     </optgroup>
     <optgroup label="Fixation / Structure / Câblage DC">
-      <option value="Support de fixation sur toiture tôle/bac acier|1395">Support de fixation toiture — 1 395 FDJ</option>
-      <option value="Crochet de liaison des supports (bride centrale)|186">Crochet de liaison (bride centrale) — 186 FDJ</option>
-      <option value="Crochet de fixation des panneaux (bride de fin)|186">Crochet de fixation (bride de fin) — 186 FDJ</option>
-      <option value="Vis autoperceuse fine pour tôle 5×5×38mm|47">Vis autoperceuse 5×5×38mm — 47 FDJ</option>
+      <option value="Support de fixation sur toiture tôle/bac acier (33060501003)|1395">Support de fixation toiture — 1 395 FDJ</option>
+      <option value="Crochet de liaison des supports (bride centrale) (33060501021)|186">Crochet de liaison (bride centrale) — 186 FDJ</option>
+      <option value="Crochet de fixation des panneaux (bride de fin) (33060501020)|186">Crochet de fixation (bride de fin) — 186 FDJ</option>
+      <option value="Vis autoperceuse fine pour tôle 5×5×38mm (33060501038)|47">Vis autoperceuse 5×5×38mm — 47 FDJ</option>
       <option value="Vis Parker 6×1¼ (paquet)|5200">Vis Parker 6×1¼ (paquet) — 5 200 FDJ</option>
-      <option value="Profilé métallique pour supports, 6m|6200">Profilé métallique 6m — 6 200 FDJ</option>
-      <option value="Rail aluminium premium (REMPLACE le profilé métallique standard)|17050">⚠️ Rail aluminium premium 6m — REMPLACE le métallique, ne pas cumuler — 17 050 FDJ</option>
-      <option value="Connecteur mâle/femelle type MC4, 1000V/30A|155">Connecteur MC4 30A — 155 FDJ</option>
-      <option value="Connecteur MC4 (1000V/50A)|155">Connecteur MC4 50A — 155 FDJ</option>
-      <option value="Cosse de câble à sertir (5-6mm²)|16">Cosse de câble à sertir 5-6mm² — 16 FDJ</option>
+      <option value="Profilé métallique pour supports, 6m (33060501039)|6200">Profilé métallique 6m — 6 200 FDJ</option>
+      <option value="Rail aluminium premium (REMPLACE le profilé métallique standard) (33060501037)|17050">⚠️ Rail aluminium premium 6m — REMPLACE le métallique, ne pas cumuler — 17 050 FDJ</option>
+      <option value="Connecteur mâle/femelle type MC4, 1000V/30A (33060501004)|155">Connecteur MC4 30A — 155 FDJ</option>
+      <option value="Connecteur MC4 (1000V/50A) (33060501005)|155">Connecteur MC4 50A — 155 FDJ</option>
+      <option value="Cosse de câble à sertir (5-6mm²) (33060501040)|16">Cosse de câble à sertir 5-6mm² — 16 FDJ</option>
     </optgroup>
     <optgroup label="Câbles solaires">
-      <option value="Câble solaire souple 6mm², rouge, positif (+)|485">Câble solaire 6mm² rouge (+) — 485 FDJ/m</option>
-      <option value="Câble solaire souple 6mm², noir, négatif (−)|485">Câble solaire 6mm² noir (−) — 485 FDJ/m</option>
-      <option value="Câble solaire souple 10mm², rouge, positif (+)|855">Câble solaire 10mm² rouge (+) — 855 FDJ/m</option>
-      <option value="Câble solaire souple 10mm², noir, négatif (−)|855">Câble solaire 10mm² noir (−) — 855 FDJ/m</option>
+      <option value="Câble solaire souple 6mm², rouge, positif (+) (33060401002)|485">Câble solaire 6mm² rouge (+) — 485 FDJ/m</option>
+      <option value="Câble solaire souple 6mm², noir, négatif (−) (33060401001)|485">Câble solaire 6mm² noir (−) — 485 FDJ/m</option>
+      <option value="Câble solaire souple 10mm², rouge, positif (+) (33060401004)|855">Câble solaire 10mm² rouge (+) — 855 FDJ/m</option>
+      <option value="Câble solaire souple 10mm², noir, négatif (−) (33060401003)|855">Câble solaire 10mm² noir (−) — 855 FDJ/m</option>
+    </optgroup>
+    <optgroup label="Câbles AC">
+      <option value="Câble AC 5×10 rigide, cuivre|1800">Câble AC 5×10 rigide, cuivre — 1 800 FDJ/m</option>
     </optgroup>
     <optgroup label="Quincaillerie complémentaire">
       <option value="Goulotte plastique 16×25×2m|650">Goulotte plastique 16×25×2m — 650 FDJ</option>
@@ -3625,6 +3668,9 @@ function printDevis(existingWin, langOverride){
   const ph  = '${L.ph_desc}';
   const loc = '${localeStr}';
   const DOSSIER_REF = ${JSON.stringify(dossier)};
+  const DEVIS_STORAGE_KEY = ${JSON.stringify(STORAGE_KEY)};
+  const DEVIS_STORAGE_SUBKEY = ${JSON.stringify(STORAGE_SUBKEY)};
+  const IS_SPECIAL = ${special ? 'true' : 'false'};
   const DEFAULT_PU = [${panDefaultPu}, ${ondDefaultPu}, ${batDefaultPu}, ${accessoiresPu + protectionsPu}, ${15000 * nbPan}];
   function fmt(n){ return Math.round(n).toLocaleString(loc)+' FDJ'; }
   function fmtLine(n){ return Math.round(n).toLocaleString(loc); }
@@ -3637,7 +3683,7 @@ function printDevis(existingWin, langOverride){
   function switchDevisLang(lang){
     recalc(); // persiste l'état actuel des lignes (déjà modifié éventuellement) avant de reconstruire la page
     if(window.opener && !window.opener.closed){
-      window.opener.printDevis(window, lang);
+      window.opener.printDevis(window, lang, IS_SPECIAL);
     }
   }
   function saveDevisNow(){
@@ -3686,9 +3732,35 @@ function printDevis(existingWin, langOverride){
     document.getElementById('ttc').textContent=fmt(sub+tva);
     // Sauvegarde automatique du devis pour ce dossier
     if(DOSSIER_REF){
-      try { localStorage.setItem('wassel_devis_'+DOSSIER_REF, JSON.stringify({lignes: lignesActuelles, tvaExempt: exempt})); }
+      try {
+        const root = JSON.parse(localStorage.getItem(DEVIS_STORAGE_KEY) || '{}');
+        root[DEVIS_STORAGE_SUBKEY] = {lignes: lignesActuelles, tvaExempt: exempt};
+        localStorage.setItem(DEVIS_STORAGE_KEY, JSON.stringify(root));
+      }
       catch(e){ /* stockage plein ou indisponible : on ignore silencieusement */ }
     }
+  }
+  function stripAccents(s){
+    return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+  function filterExtraCatalog(query){
+    const sel = document.getElementById('extra-catalog');
+    if(!sel) return;
+    const q = stripAccents(query.trim().toLowerCase());
+    let firstMatch = null;
+    Array.from(sel.options).forEach(opt => {
+      if(!opt.value){ return; } // laisse toujours visible l'option "— Choisir un article —"
+      const match = !q || stripAccents(opt.textContent.toLowerCase()).includes(q) || stripAccents(opt.value.toLowerCase()).includes(q);
+      opt.hidden = !match;
+      opt.disabled = !match;
+      if(match && !firstMatch) firstMatch = opt;
+    });
+    // Masque aussi les optgroup qui n'ont plus aucune option visible, pour ne pas laisser un titre de groupe vide
+    Array.from(sel.getElementsByTagName('optgroup')).forEach(g => {
+      const hasVisible = Array.from(g.options).some(o => !o.hidden);
+      g.hidden = !hasVisible;
+    });
+    if(q && firstMatch) sel.value = firstMatch.value;
   }
   function addExtraFromCatalog(){
     const sel = document.getElementById('extra-catalog');
@@ -3697,7 +3769,7 @@ function printDevis(existingWin, langOverride){
     const i=rowCount++;
     const tr=document.createElement('tr');
     tr.id='row'+i;
-    tr.innerHTML=\`<td><input type="text" id="desc\${i}" value="\${desc}" style="width:100%;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="recalc()"></td><td class="num"><input type="number" id="qty\${i}" value="1" min="0" style="width:60px;text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="recalc()"></td><td class="num"><input type="text" inputmode="numeric" id="pu\${i}" value="\${pu}" style="width:110px;text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="onPuInput(this)"></td><td class="num"><span class="rem-wrap"><input type="number" id="rem\${i}" value="0" min="0" max="100" style="text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;" oninput="recalc()">%</span></td><td class="num"><span class="tot-box" id="tot\${i}">0</span></td><td><button class="btn-del-line" onclick="delRow(\${i})">X</button></td>\`;
+    tr.innerHTML=\`<td><input type="text" id="desc\${i}" value="\${desc}" style="width:100%;min-width:380px;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="recalc()"></td><td class="num"><input type="number" id="qty\${i}" value="1" min="0" style="width:60px;text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="recalc()"></td><td class="num"><input type="text" inputmode="numeric" id="pu\${i}" value="\${pu}" style="width:60px;text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="onPuInput(this)"></td><td class="num"><span class="rem-wrap"><input type="number" id="rem\${i}" value="0" min="0" max="100" style="text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;" oninput="recalc()">%</span></td><td class="num"><span class="tot-box" id="tot\${i}">0</span></td><td><button class="btn-del-line" onclick="delRow(\${i})">X</button></td>\`;
     document.querySelector('tbody').appendChild(tr);
     formatPu(document.getElementById('pu'+i));
     recalc();
@@ -3706,7 +3778,7 @@ function printDevis(existingWin, langOverride){
     const i=rowCount++;
     const tr=document.createElement('tr');
     tr.id='row'+i;
-    tr.innerHTML=\`<td><input type="text" id="desc\${i}" value="" placeholder="\${ph}" style="width:100%;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="recalc()"></td><td class="num"><input type="number" id="qty\${i}" value="1" min="0" style="width:60px;text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="recalc()"></td><td class="num"><input type="text" inputmode="numeric" id="pu\${i}" value="0" style="width:110px;text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="onPuInput(this)"></td><td class="num"><span class="rem-wrap"><input type="number" id="rem\${i}" value="0" min="0" max="100" style="text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;" oninput="recalc()">%</span></td><td class="num"><span class="tot-box" id="tot\${i}">0</span></td><td><button class="btn-del-line" onclick="delRow(\${i})">X</button></td>\`;
+    tr.innerHTML=\`<td><input type="text" id="desc\${i}" value="" placeholder="\${ph}" style="width:100%;min-width:380px;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="recalc()"></td><td class="num"><input type="number" id="qty\${i}" value="1" min="0" style="width:60px;text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="recalc()"></td><td class="num"><input type="text" inputmode="numeric" id="pu\${i}" value="0" style="width:60px;text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;font-size:11px;" oninput="onPuInput(this)"></td><td class="num"><span class="rem-wrap"><input type="number" id="rem\${i}" value="0" min="0" max="100" style="text-align:right;border:1px solid #ccc;border-radius:4px;padding:2px 4px;" oninput="recalc()">%</span></td><td class="num"><span class="tot-box" id="tot\${i}">0</span></td><td><button class="btn-del-line" onclick="delRow(\${i})">X</button></td>\`;
     document.querySelector('tbody').appendChild(tr);
     formatPu(document.getElementById('pu'+i));
     document.getElementById('desc'+i).focus();
