@@ -696,15 +696,15 @@ body.ar .sum-lbl { font-size:18px !important; }
 
     <!-- Statistiques de consommation -->
     <div class="panel" id="stats-panel" style="display:none;">
-      <div class="panel-hdr">📊 STATISTIQUES DE CONSOMMATION</div>
+      <div class="panel-hdr" id="stats-hdr">📊 STATISTIQUES DE CONSOMMATION</div>
       <div class="panel-body">
-        <div class="stitle" style="margin-top:0;">DIMENSIONNEMENT DU SYSTÈME</div>
+        <div class="stitle" id="stats-title-dim" style="margin-top:0;">DIMENSIONNEMENT DU SYSTÈME</div>
         <div id="stats-system" style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;"></div>
-        <div class="stitle">CONSOMMATION DES APPAREILS</div>
+        <div class="stitle" id="stats-title-conso">CONSOMMATION DES APPAREILS</div>
         <div id="stats-summary" style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;"></div>
-        <div class="stitle" style="margin-top:0;">CONSOMMATION PAR APPAREIL (Wh/jour)</div>
+        <div class="stitle" id="stats-title-chart" style="margin-top:0;">CONSOMMATION PAR APPAREIL (Wh/jour)</div>
         <div id="stats-chart" style="margin:6px 0 12px;"></div>
-        <div class="stitle">RÉPARTITION PAR CATÉGORIE</div>
+        <div class="stitle" id="stats-title-cat">RÉPARTITION PAR CATÉGORIE</div>
         <div id="stats-cat" style="margin:6px 0 4px;"></div>
       </div>
     </div>
@@ -813,8 +813,8 @@ body.ar .sum-lbl { font-size:18px !important; }
           <button onclick="toggleRapportFilter()" style="padding:7px;background:var(--orange);color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">📊 Rapport clients</button>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:4px;">
-          <button onclick="exportDossiers()" style="padding:7px;background:#0f1f4b;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">💾 Exporter (.json)</button>
-          <button onclick="document.getElementById('import-file-input').click()" style="padding:7px;background:#6b7280;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">📥 Importer (.json)</button>
+          <button id="btn-export-json" onclick="exportDossiers()" style="padding:7px;background:#0f1f4b;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">💾 Exporter (.json)</button>
+          <button id="btn-import-json" onclick="document.getElementById('import-file-input').click()" style="padding:7px;background:#6b7280;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">📥 Importer (.json)</button>
           <input type="file" id="import-file-input" accept=".json,application/json" style="display:none;" onchange="importDossiersFile(event)">
         </div>
         <div id="dossier-search-box" style="display:none;margin-top:6px;">
@@ -1083,9 +1083,9 @@ function renderStats(){
     +(sub?'<div style="font-size:9px;color:var(--gray);">'+sub+'</div>':'')
     +'</div>';
   sumEl.innerHTML =
-      card('Total', (totalWh/1000).toFixed(2)+' kWh/j', appareils.length+' appareil(s)')
-    + card('☀️ Jour', (jourWh/1000).toFixed(2)+' kWh', pctJ.toFixed(0)+'% du total', '#fffde7')
-    + card('🌙 Nuit', (nuitWh/1000).toFixed(2)+' kWh', pctN.toFixed(0)+'% du total', '#e8eaf6');
+      card(t('stat_total'), (totalWh/1000).toFixed(2)+' kWh/j', appareils.length+' '+t('stat_appareils'))
+    + card('☀️ '+t('stat_jour'), (jourWh/1000).toFixed(2)+' kWh', pctJ.toFixed(0)+'% '+t('stat_du_total'), '#fffde7')
+    + card('🌙 '+t('stat_nuit'), (nuitWh/1000).toFixed(2)+' kWh', pctN.toFixed(0)+'% '+t('stat_du_total'), '#e8eaf6');
 
   // Graphique barres horizontales (top 8, reste groupé)
   const sorted = [...rows].sort((a,b)=>b.wh-a.wh);
@@ -1093,7 +1093,7 @@ function renderStats(){
   let chartRows = sorted.slice(0,MAXBARS);
   if(sorted.length>MAXBARS){
     const rest = sorted.slice(MAXBARS).reduce((s,r)=>s+r.wh,0);
-    chartRows = chartRows.concat([{nom:'Autres ('+(sorted.length-MAXBARS)+')', cat:'', wh:rest}]);
+    chartRows = chartRows.concat([{nom:t('stat_autres')+' ('+(sorted.length-MAXBARS)+')', cat:'', wh:rest}]);
   }
   const maxWh = Math.max(...chartRows.map(r=>r.wh), 1);
   const barH=22, gap=8, labelW=130, chartW=380, rowW=labelW+chartW+55;
@@ -4280,10 +4280,10 @@ function renderSystemStats(){
     +'</div>';
 
   box.innerHTML =
-      card('☀️','Panneaux', nbPanTxt, kwcTxt, '#fffde7')
-    + card('📈','Production', prodTxt, tauxTxt, '#f0fdf4')
-    + card('🔋','Batterie', nbBatTxt, batTotTxt!=='–' ? (batTotTxt+' / utile '+batUtlTxt) : 'Non activée', '#e8eaf6')
-    + card('⚡','Onduleur', ondTxt || '–', mpptTxt, '#fdf2f8');
+      card('☀️',t('stat_panneaux'), nbPanTxt, kwcTxt, '#fffde7')
+    + card('📈',t('stat_production'), prodTxt, tauxTxt, '#f0fdf4')
+    + card('🔋',t('stat_batterie'), nbBatTxt, batTotTxt!=='–' ? (batTotTxt+' / '+t('stat_utile')+' '+batUtlTxt) : t('stat_non_activee'), '#e8eaf6')
+    + card('⚡',t('stat_onduleur'), ondTxt || '–', mpptTxt, '#fdf2f8');
 }
 
 // ── TRADUCTIONS ──
@@ -4311,6 +4311,8 @@ const TRANS = {
     opt_combine_oui: "Oui (coffret DC / combiner avant l'onduleur)",
     opt_combine_non: "Non (chaque string sur son propre MPPT)",
     lbl_distance: "Distance panneaux → onduleur (m)",
+    lbl_rangees: "Nombre de rangées (structure toiture)",
+    lbl_rails: "Rails / panneau",
     lbl_avec_panneaux: "Installation avec panneaux solaires ?",
     opt_avec_panneaux_oui: "☀️ Oui, avec panneaux solaires",
     opt_avec_panneaux_non: "🔋 Non, batterie seule (recharge réseau/EDD uniquement)",
@@ -4382,7 +4384,10 @@ const TRANS = {
     btn_nouveau:    "🆕 Nouveau client",
     btn_sauvegarder:"💾 Sauvegarder",
     btn_voir_dos:   "📋 Voir / Charger",
-    btn_rapport:    "📊 Rapport clients",
+    stats_hdr:"📊 STATISTIQUES DE CONSOMMATION", stats_title_dim:"DIMENSIONNEMENT DU SYSTÈME", stats_title_conso:"CONSOMMATION DES APPAREILS", stats_title_chart:"CONSOMMATION PAR APPAREIL (Wh/jour)", stats_title_cat:"RÉPARTITION PAR CATÉGORIE",
+    stat_panneaux:"Panneaux", stat_production:"Production", stat_batterie:"Batterie", stat_onduleur:"Onduleur", stat_utile:"utile", stat_non_activee:"Non activée",
+    stat_total:"Total", stat_jour:"Jour", stat_nuit:"Nuit", stat_du_total:"du total", stat_appareils:"appareil(s)", stat_autres:"Autres",
+    btn_rapport:    "📊 Rapport clients", btn_devis:"📄 Imprimer Devis", btn_devis_special:"📄 Devis spécial (sans calcul)", btn_schema:"📐 Schéma de câblage", btn_acc_detail:"📋 Détail accessoires (interne)", btn_export_json:"💾 Exporter (.json)", btn_import_json:"📥 Importer (.json)",
     dos_clients:    "DOSSIERS CLIENTS",
     dos_search:     "🔍 Rechercher N° ou nom client...",
     lbl_source:     "Source",
@@ -4459,6 +4464,8 @@ const TRANS = {
     opt_combine_oui: "Yes (DC combiner box before the inverter)",
     opt_combine_non: "No (each string on its own MPPT)",
     lbl_distance: "Distance panels → inverter (m)",
+    lbl_rangees: "Number of rows (roof structure)",
+    lbl_rails: "Rails / panel",
     lbl_avec_panneaux: "Solar panel installation?",
     opt_avec_panneaux_oui: "☀️ Yes, with solar panels",
     opt_avec_panneaux_non: "🔋 No, battery only (grid/generator recharge only)",
@@ -4572,7 +4579,10 @@ const TRANS = {
     btn_nouveau:    "🆕 New client",
     btn_sauvegarder:"💾 Save",
     btn_voir_dos:   "📋 View / Load",
-    btn_rapport:    "📊 Client Report",
+    stats_hdr:"📊 CONSUMPTION STATISTICS", stats_title_dim:"SYSTEM SIZING", stats_title_conso:"APPLIANCE CONSUMPTION", stats_title_chart:"CONSUMPTION PER APPLIANCE (Wh/day)", stats_title_cat:"BREAKDOWN BY CATEGORY",
+    stat_panneaux:"Panels", stat_production:"Production", stat_batterie:"Battery", stat_onduleur:"Inverter", stat_utile:"usable", stat_non_activee:"Not activated",
+    stat_total:"Total", stat_jour:"Day", stat_nuit:"Night", stat_du_total:"of total", stat_appareils:"appliance(s)", stat_autres:"Others",
+    btn_rapport:    "📊 Client Report", btn_devis:"📄 Print Quote", btn_devis_special:"📄 Special quote (no calculation)", btn_schema:"📐 Wiring diagram", btn_acc_detail:"📋 Accessories detail (internal)", btn_export_json:"💾 Export (.json)", btn_import_json:"📥 Import (.json)",
     dos_clients:    "CLIENT FILES",
     dos_search:     "🔍 Search by file N° or client name...",
     sol_dj:         "Djibouti city – 6h", sol_as:"Ali Sabieh – 6.5h",
@@ -4603,6 +4613,8 @@ const TRANS = {
     opt_combine_oui: "نعم (صندوق تجميع DC قبل الإنفرتر)",
     opt_combine_non: "لا (كل سلسلة على مدخل MPPT خاص بها)",
     lbl_distance: "المسافة بين الألواح والإنفرتر (م)",
+    lbl_rangees: "عدد الصفوف (هيكل السطح)",
+    lbl_rails: "القضبان / لوح",
     lbl_avec_panneaux: "تركيب مع ألواح شمسية؟",
     opt_avec_panneaux_oui: "☀️ نعم، مع ألواح شمسية",
     opt_avec_panneaux_non: "🔋 لا، بطارية فقط (إعادة الشحن من الشبكة/المولد فقط)",
@@ -4676,7 +4688,10 @@ const TRANS = {
     btn_nouveau:    "🆕 عميل جديد",
     btn_sauvegarder:"💾 حفظ الملف",
     btn_voir_dos:   "📋 عرض / تحميل",
-    btn_rapport:    "📊 تقرير العملاء",
+    stats_hdr:"📊 إحصائيات الاستهلاك", stats_title_dim:"تحديد أبعاد النظام", stats_title_conso:"استهلاك الأجهزة", stats_title_chart:"الاستهلاك حسب الجهاز (وات/يوم)", stats_title_cat:"التوزيع حسب الفئة",
+    stat_panneaux:"الألواح", stat_production:"الإنتاج", stat_batterie:"البطارية", stat_onduleur:"الإنفرتر", stat_utile:"مفيدة", stat_non_activee:"غير مفعّلة",
+    stat_total:"المجموع", stat_jour:"النهار", stat_nuit:"الليل", stat_du_total:"من المجموع", stat_appareils:"جهاز/أجهزة", stat_autres:"أخرى",
+    btn_rapport:    "📊 تقرير العملاء", btn_devis:"📄 طباعة عرض السعر", btn_devis_special:"📄 عرض خاص (بدون حساب)", btn_schema:"📐 مخطط التوصيل", btn_acc_detail:"📋 تفاصيل الملحقات (داخلي)", btn_export_json:"💾 تصدير (.json)", btn_import_json:"📥 استيراد (.json)",
     dos_clients:    "ملفات العملاء",
     dos_search:     "🔍 بحث برقم الملف أو اسم العميل...",
     lbl_source:     "المصدر",
@@ -4859,7 +4874,7 @@ function applyLang(){
   const labels = document.querySelectorAll('.pfield label');
   const labelKeys = ['lbl_dossier','lbl_client','lbl_adresse','lbl_tel','lbl_date','lbl_region',
                      'lbl_reseau','lbl_batmode','lbl_autonomie','lbl_panneau',
-                     'lbl_source','lbl_panparstring','lbl_combine','lbl_distance','lbl_avec_panneaux'];
+                     'lbl_source','lbl_panparstring','lbl_combine','lbl_distance','lbl_rangees','lbl_rails','lbl_avec_panneaux'];
   labels.forEach((lbl, i) => {
     if(labelKeys[i]){
       // Preserve the AUTO badge if present
@@ -5081,6 +5096,16 @@ function setLang(lang){
   document.querySelectorAll('[onclick="saveDossier()"]').forEach(b => b.innerHTML = t('btn_sauvegarder'));
   document.querySelectorAll('[onclick="toggleDossiers()"]').forEach(b => b.textContent = t('btn_voir_dos'));
   document.querySelectorAll('[onclick="genRapport()"]').forEach(b => b.textContent = t('btn_rapport'));
+  document.querySelectorAll('[onclick="toggleRapportFilter()"]').forEach(b => b.textContent = t('btn_rapport'));
+  const btnDevis = document.getElementById('btn-devis'); if(btnDevis) btnDevis.textContent = t('btn_devis');
+  const btnDevisSpecial = document.getElementById('btn-devis-special'); if(btnDevisSpecial) btnDevisSpecial.textContent = t('btn_devis_special');
+  const btnSchemaMenu = document.getElementById('btn-schema'); if(btnSchemaMenu) btnSchemaMenu.textContent = t('btn_schema');
+  const btnAccDetail = document.getElementById('btn-acc-detail'); if(btnAccDetail) btnAccDetail.textContent = t('btn_acc_detail');
+  const btnExportJson = document.getElementById('btn-export-json'); if(btnExportJson) btnExportJson.textContent = t('btn_export_json');
+  const btnImportJson = document.getElementById('btn-import-json'); if(btnImportJson) btnImportJson.textContent = t('btn_import_json');
+  const statsIds = {'stats-hdr':'stats_hdr','stats-title-dim':'stats_title_dim','stats-title-conso':'stats_title_conso','stats-title-chart':'stats_title_chart','stats-title-cat':'stats_title_cat'};
+  Object.keys(statsIds).forEach(id => { const el = document.getElementById(id); if(el) el.textContent = t(statsIds[id]); });
+  renderStats(); renderSystemStats();
 
   // Titre dossiers clients
   const dosTitleEl = document.querySelector('.res-hdr[style*="15803d"]');
