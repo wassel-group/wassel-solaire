@@ -351,9 +351,9 @@ body.ar .sum-lbl { font-size:18px !important; }
     <p style="margin-top:2px;">✉ contact@wassel-group.com &nbsp;|&nbsp; ✉ office@wassel-group.com &nbsp;|&nbsp; 🌐 www.wassel-group.com</p>
   </div>
   <div style="display:flex;gap:4px;align-items:center;">
-    <button class="lang-btn" id="lang-fr" onclick="setLang('fr')" style="opacity:0.5;">🇫🇷 FR</button>
+    <button class="lang-btn" id="lang-fr" onclick="setLang('fr')" style="opacity:1;">🇫🇷 FR</button>
     <button class="lang-btn" id="lang-ar" onclick="setLang('ar')" style="opacity:0.5;">🇸🇦 AR</button>
-    <button class="lang-btn" id="lang-en" onclick="setLang('en')" style="opacity:1;">🇬🇧 EN</button>
+    <button class="lang-btn" id="lang-en" onclick="setLang('en')" style="opacity:0.5;">🇬🇧 EN</button>
   </div>
 </header>
 
@@ -453,11 +453,11 @@ body.ar .sum-lbl { font-size:18px !important; }
           </div>
 
           <div class="pfield" id="rangees-field"><label id="lbl-rangees">Nombre de rangées (structure toiture)</label>
-            <input type="number" id="p-rangees" min="1" max="20" value="1" oninput="calculate()">
+            <input type="number" id="p-rangees" min="1" max="20" value="2" oninput="calculate()">
           </div>
 
           <div class="pfield" id="rails-field"><label id="lbl-rails">Rails / panneau</label>
-            <input type="number" id="p-rails" min="1" max="6" value="2" oninput="calculate()">
+            <input type="number" id="p-rails" min="1" max="6" value="3" oninput="calculate()">
           </div>
 
           <div class="pfield" style="grid-column:span 2;">
@@ -490,7 +490,7 @@ body.ar .sum-lbl { font-size:18px !important; }
               <option value="SUN-80K-SG01HP3-EU|80|6|hv|tri">SUN-80K-SG01HP3-EU – 80kW / 6 MPPT</option>
             </optgroup>
             <optgroup label="✅ STOCK WASSEL – Triphasé LV">
-              <option value="SUN-20K-SG01HP3-EU-AM2|20|3|lv|tri">SUN-20K-SG01HP3-EU-AM2 – 20kW / 3 MPPT / LV</option>
+              <option value="SUN-20K-SG01HP3-EU-AM2|20|3|hv|tri">SUN-20K-SG01HP3-EU-AM2 – 20kW / 3 MPPT / HV</option>
             </optgroup>
             <optgroup label="✅ STOCK WASSEL – Monophasé LV">
               <option value="SUN-6K-OG01LP1-EU-AM2|6|2|lv|mono">SUN-6K-OG01LP1-EU-AM2 – 6kW / 2 MPPT / LV (MPPT à confirmer)</option>
@@ -2400,6 +2400,7 @@ function onBatModeChange(){
   const isHV = mode === 'hv';
   document.getElementById('autonomie-field').style.display = on ? '' : 'none';
   document.getElementById('bat-model-field').style.display = on ? '' : 'none';
+  document.getElementById('bat-model-select-field').style.display = on ? '' : 'none';
   document.getElementById('bat-info').style.display        = on ? '' : 'none';
 
   // ── AMÉLIORATION : cohérence batterie <-> onduleur ──
@@ -2570,7 +2571,6 @@ function computeAccessoiresDetail(nbPan, distanceM, panParString, stringsCombine
   railsParPanneau = Math.max(1, parseInt(railsParPanneau) || 2);
   nbOnd = Math.max(1, parseInt(nbOnd) || 1);
   const ACCESSOIRES_PAR_PANNEAU = {
-    supportToiture:  { key:'support_toiture', nom:'Support de fixation sur toiture tôle/bac acier', ratio: 6,   pu: 1395 }, // ratio confirmé par Farouk le 04/08/2026 (auparavant 4, non documenté)
     cosseTerre:      { key:'cosse_terre',     nom:'Cosse de terre', ratio: 1, pu: 16 }, // 1 par panneau, confirmé par Farouk le 05/08/2026
   };
   // Crochet de liaison (brides centrales) et crochet de fixation (brides de fin) : formules
@@ -2578,9 +2578,13 @@ function computeAccessoiresDetail(nbPan, distanceM, panParString, stringsCombine
   // dépendantes du nombre de rangées et de rails/panneau — remplace l'ancien ratio fixe/panneau.
   const CROCHET_LIAISON_INFO = { key:'crochet_liaison', nom:'Crochet de liaison des supports (bride centrale)', pu: 186 };
   const CROCHET_FIXATION_INFO = { key:'crochet_fixation', nom:'Crochet de fixation des panneaux (bride de fin)', pu: 186 };
+  // Support de fixation : plus un ratio fixe par panneau, mais la somme des crochets de liaison
+  // + crochets de fixation (chaque crochet, qu'il soit central ou de fin, se fixe sur un support)
+  // — confirmé par Farouk le 29/08/2026, remplace l'ancien ratio de 6/panneau.
+  const SUPPORT_TOITURE_INFO = { key:'support_toiture', nom:'Support de fixation sur toiture tôle/bac acier', pu: 1395 };
   // Vis autoperceuse : plus un ratio fixe par panneau, mais 8 vis par support de fixation
   // (confirmé par Farouk le 05/08/2026 — remplace l'ancien ratio de 64/panneau, non documenté).
-  const VIS_PAR_SUPPORT = 8;
+  const VIS_PAR_SUPPORT = 6; // corrigé le 29/08/2026 par Farouk (auparavant 8)
   const VIS_INFO = { key:'vis', nom:'Vis autoperceuse fine pour tôle 5×5×38mm', pu: 47 };
   const PROFILE_6M = { key:'profile_6m', nom:'Profilé métallique pour supports, 6m', metresParPanneau: 4.8, longueurUnite: 6, pu: 6200 };
   const MARGE_ACCESSOIRES = 1.10; // 10% pour chutes/raccords/imprévus (confirmé par Farouk)
@@ -2603,22 +2607,28 @@ function computeAccessoiresDetail(nbPan, distanceM, panParString, stringsCombine
     const liaisonQty = (nbRangees === 1)
       ? (nbPan - 1) * railsParPanneau
       : ((nbPan / nbRangees) - 1) * nbRangees * railsParPanneau;
-    const liaisonQtyR = Math.round(Math.max(0, liaisonQty));
+    const liaisonQtyR = Math.round(Math.max(0, liaisonQty) * 1.10); // +10% de marge (surplus), confirmé par Farouk le 29/08/2026
     const liaisonSousTotal = liaisonQtyR * CROCHET_LIAISON_INFO.pu;
     items.push({ key: CROCHET_LIAISON_INFO.key, nom: CROCHET_LIAISON_INFO.nom, ratio: '(n-1)×rails', unite:'pièce', qty: liaisonQtyR, pu: CROCHET_LIAISON_INFO.pu, sousTotal: liaisonSousTotal });
     subtotalAvantMarge += liaisonSousTotal;
 
     // Crochet de fixation (brides de fin) : 2 par ligne de rail (début + fin), indépendant du
     // nombre de panneaux — dépend uniquement des rangées et des rails/panneau.
-    const fixationQty = 2 * nbRangees * railsParPanneau;
+    const fixationQty = Math.round(2 * nbRangees * railsParPanneau * 1.10); // +10% de marge (surplus), confirmé par Farouk le 29/08/2026
     const fixationSousTotal = fixationQty * CROCHET_FIXATION_INFO.pu;
     items.push({ key: CROCHET_FIXATION_INFO.key, nom: CROCHET_FIXATION_INFO.nom, ratio: '2×rangées×rails', unite:'pièce', qty: fixationQty, pu: CROCHET_FIXATION_INFO.pu, sousTotal: fixationSousTotal });
     subtotalAvantMarge += fixationSousTotal;
 
+    // Support de fixation = crochet de liaison + crochet de fixation (chaque crochet, central
+    // ou de fin, repose sur un support toiture).
+    const supportQty = Math.round((liaisonQtyR + fixationQty) * 1.10); // +10% de marge (surplus) en plus, confirmé par Farouk le 29/08/2026
+    const supportSousTotal = supportQty * SUPPORT_TOITURE_INFO.pu;
+    items.push({ key: SUPPORT_TOITURE_INFO.key, nom: SUPPORT_TOITURE_INFO.nom, ratio: 'liaison+fixation', unite:'pièce', qty: supportQty, pu: SUPPORT_TOITURE_INFO.pu, sousTotal: supportSousTotal });
+    subtotalAvantMarge += supportSousTotal;
+
     // Vis autoperceuse : 8 par support de fixation posé (dépend donc du ratio support ci-dessus,
     // pas d'un ratio fixe par panneau).
-    const supportQty = nbPan * ACCESSOIRES_PAR_PANNEAU.supportToiture.ratio;
-    const visQty = supportQty * VIS_PAR_SUPPORT;
+    const visQty = Math.round(supportQty * VIS_PAR_SUPPORT * 1.10); // +10% de marge (surplus), confirmé par Farouk le 29/08/2026
     const visSousTotal = visQty * VIS_INFO.pu;
     items.push({ key: VIS_INFO.key, nom: VIS_INFO.nom, ratio: VIS_PAR_SUPPORT+'/support', unite:'pièce', qty: visQty, pu: VIS_INFO.pu, sousTotal: visSousTotal });
     subtotalAvantMarge += visSousTotal;
@@ -3359,7 +3369,7 @@ function printDevis(existingWin, langOverride, special){
     { desc: L.desc_mdo,                qty: 1,      pu: 15000 * nbPan, remise: 0, role:'labour' },
     { desc: L.desc_cab,                qty: 1,      pu: accessoiresPu + protectionsPu,  remise: 0, role:'accessoires' },
     { desc: L.desc_forfait,            qty: 1,      pu: 0,      remise: 0 },
-  ].filter(l => l.role !== 'panel' || l.qty > 0); // pas de ligne panneau si l'installation n'en a pas
+  ].filter(l => (l.role !== 'panel' && l.role !== 'batterie') || l.qty > 0); // pas de ligne panneau/batterie si l'installation n'en a pas
   const defautParRole = {};
   lignesDefaut.forEach(d => { if(d.role) defautParRole[d.role] = d; });
   // ── Clé de sauvegarde : un devis spécial pour un dossier N ne touche jamais le
@@ -3550,12 +3560,34 @@ function printDevis(existingWin, langOverride, special){
       <option value="Onduleur SUN-8K-SG01HP3-EU-AM2|370788">SUN-8K-SG01HP3-EU-AM2 — 370 788 FDJ</option>
       <option value="Onduleur SUN-12K-SG02LP1-EU-AM3-P (33060103012)|550250">SUN-12K-SG02LP1-EU-AM3-P — 550 250 FDJ</option>
       <option value="Onduleur SUN-18K-SG01LP1-EU-AM3|790500">SUN-18K-SG01LP1-EU-AM3 — 790 500 FDJ</option>
-      <option value="Onduleur SUN-20K-SG01HP3-EU-AM2|891250">SUN-20K-SG01HP3-EU-AM2 — 891 250 FDJ</option>
-      <option value="Onduleur SUN-20K-SG05LP3-EU-SM2 (33060103015)|891250">SUN-20K-SG05LP3-EU-SM2 — 891 250 FDJ</option>
+      <option value="Onduleur SUN-20K-SG01HP3-EU-AM2 (33060103004)|558000">SUN-20K-SG01HP3-EU-AM2 — 558 000 FDJ</option>
+      <option value="Onduleur SUN-20K-SG05LP3-EU-SM2 (33060103015)|575000">SUN-20K-SG05LP3-EU-SM2 — 575 000 FDJ</option>
+      <option value="Onduleur SUN-12K-SG01HP3-EU-AM2 (33060103003)|401450">SUN-12K-SG01HP3-EU-AM2 — 401 450 FDJ</option>
       <option value="Onduleur SUN-25K-SG01HP3-EU-AM3-25 (33060103017)|705250">SUN-25K-SG01HP3-EU-AM3-25 — 705 250 FDJ</option>
       <option value="Onduleur SUN-30K-SG01HP3-EU-BM3 (33060103005)|1007500">SUN-30K-SG01HP3-EU-BM3 — 1 007 500 FDJ</option>
       <option value="Onduleur SUN-50K-SG01HP3-EU-BM4 (33060103006)|1433750">SUN-50K-SG01HP3-EU-BM4 — 1 433 750 FDJ</option>
       <option value="Onduleur SUN-80K-SG01HP3-EU (33060103007)|2131250">SUN-80K-SG01HP3-EU — 2 131 250 FDJ</option>
+    </optgroup>
+    <optgroup label="⏳ Nouveaux articles (prix en attente)">
+      <option value="Onduleur SUN-30K-SG02HP3-EU-AM3 (prix à confirmer)|0">SUN-30K-SG02HP3-EU-AM3 — prix en attente</option>
+      <option value="Onduleur SUN-80K-SG02HP3-EU-EM6 (prix à confirmer)|0">SUN-80K-SG02HP3-EU-EM6 — prix en attente</option>
+      <option value="Onduleur SUN-125K-SG01HP3-EU-GM10 (prix à confirmer)|0">SUN-125K-SG01HP3-EU-GM10 — prix en attente</option>
+      <option value="Onduleur SUN-10K-SG02LP1-EU-AM3-P (prix à confirmer)|0">SUN-10K-SG02LP1-EU-AM3-P — prix en attente</option>
+      <option value="Onduleur SUN-16K-SG01LP1-EU-AM3-P (prix à confirmer)|0">SUN-16K-SG01LP1-EU-AM3-P — prix en attente</option>
+      <option value="Onduleur SUN-3.6K-SG04LP1-EU-SM2 (prix à confirmer)|0">SUN-3.6K-SG04LP1-EU-SM2 — prix en attente</option>
+      <option value="Onduleur SUN-6K-SG04LP1-EU-SM2 (prix à confirmer)|0">SUN-6K-SG04LP1-EU-SM2 — prix en attente</option>
+      <option value="Onduleur SUN-3.6K-OG03LP1-EU-AM1 (prix à confirmer)|0">SUN-3.6K-OG03LP1-EU-AM1 — prix en attente</option>
+      <option value="Onduleur SUN-6K-OG03LP1-EU-AM2 (prix à confirmer)|0">SUN-6K-OG03LP1-EU-AM2 — prix en attente</option>
+      <option value="SUN-225G4-EU-Q0 — catégorie à confirmer (micro-onduleur ?) (prix à confirmer)|0">SUN-225G4-EU-Q0 — prix + catégorie en attente</option>
+      <option value="SUN-M160G4-EU-Q0 — catégorie à confirmer (micro-onduleur ?) (prix à confirmer)|0">SUN-M160G4-EU-Q0 — prix + catégorie en attente</option>
+      <option value="Pièce détachée onduleur Smart Witch (prix à confirmer)|0">Smart Witch (pièce détachée onduleur) — prix en attente</option>
+      <option value="Batterie lithium BOS-B PRO A3 (prix à confirmer)|0">Batterie BOS-B PRO A3 — prix en attente</option>
+      <option value="Rack batterie 14 (prix à confirmer)|0">Rack batterie 14 — prix en attente</option>
+      <option value="Boîtier de contrôle PDU(BMS) pour BOS-A (prix à confirmer)|0">PDU(BMS) pour BOS-A — prix en attente</option>
+      <option value="Boîtier de contrôle PDU(BMS) pour BOS-G PRO (prix à confirmer)|0">PDU(BMS) pour BOS-G PRO — prix en attente</option>
+      <option value="Boîtier de contrôle PDU(BMS) pour BOS-W (prix à confirmer)|0">PDU(BMS) pour BOS-W — prix en attente</option>
+      <option value="Boîtier de contrôle BOS-B-PDU-2 (prix à confirmer)|0">BOS-B-PDU-2 — prix en attente</option>
+      <option value="Pièce détachée batterie BOS-B-PDU-2 (accessoires) (prix à confirmer)|0">BOS-B-PDU-2 (accessoires) — prix en attente</option>
     </optgroup>
     <optgroup label="Batteries Deye">
       <option value="Batterie Deye SE-F5 (33060602001)|232500">Deye SE-F5 (5.12kWh) — 232 500 FDJ</option>
@@ -3835,6 +3867,8 @@ const REF_ONDULEUR = {
   'SUN-50K-SG01HP3-EU-BM4': '33060103006',
   'SUN-80K-SG01HP3-EU': '33060103007',
   'SUN-20K-SG05LP3-EU-SM2': '33060103015',
+  'SUN-20K-SG01HP3-EU-AM2': '33060103004',
+  'SUN-12K-SG01HP3-EU-AM2': '33060103003',
 };
 const REF_BATTERIE = {
   'Deye SE-F5': '33060602001',
@@ -3958,10 +3992,10 @@ function calculate(){
     {id:'SUN-10K-SG05LP3-EU', kw:10, phase:'tri',  bat:'lv', mppt:2},
     {id:'SUN-12K-SG05LP3-EU', kw:12, phase:'tri',  bat:'lv', mppt:2},
     {id:'SUN-16K-SG05LP3-EU', kw:16, phase:'tri',  bat:'lv', mppt:2},
-    {id:'SUN-20K-SG05LP3-EU-SM2', kw:20, phase:'tri',  bat:'lv', mppt:2, prix:891250}, // ID et prix corrigés le 04/08/2026 pour correspondre à pricing.js
+    {id:'SUN-20K-SG05LP3-EU-SM2', kw:20, phase:'tri',  bat:'lv', mppt:2, prix:575000}, // prix corrigé le 27/08/2026 par Farouk (auparavant 891250)
     // Triphasé HV — ✅ Stock Wassel (à privilégier par la sélection automatique)
-    {id:'SUN-12K-SG01HP3-EU-AM2', kw:12, phase:'tri', bat:'hv', mppt:2, stock:false},
-    {id:'SUN-20K-SG01HP3-EU-AM2', kw:20, phase:'tri', bat:'lv', mppt:3, stock:true, prix:891250}, // classé LV (confirmé par Farouk le 26/07/2026, malgré le préfixe "HP3")
+    {id:'SUN-12K-SG01HP3-EU-AM2', kw:12, phase:'tri', bat:'hv', mppt:2, stock:false, prix:401450}, // prix confirmé par Farouk le 27/08/2026
+    {id:'SUN-20K-SG01HP3-EU-AM2', kw:20, phase:'tri', bat:'hv', mppt:3, stock:true, prix:558000}, // reclassé HV et prix corrigé le 27/08/2026 par Farouk (auparavant classé LV à 891250, erreur du 26/07/2026)
     {id:'SUN-30K-SG01HP3-EU-BM3', kw:30, phase:'tri', bat:'hv', mppt:3, stock:true, prix:1007500},
     {id:'SUN-50K-SG01HP3-EU-BM4', kw:50, phase:'tri', bat:'hv', mppt:4, stock:true, prix:1433750},
     {id:'SUN-80K-SG01HP3-EU',     kw:80, phase:'tri', bat:'hv', mppt:6, stock:true, prix:2131250},
@@ -4134,6 +4168,13 @@ function calculate(){
     }
     batTot = nbBat * batKwh;
     batUtl = batTot * 0.8;
+  } else {
+    // Mode "Sans batterie" : on efface toute trace d'un calcul batterie précédent
+    // (nombre de modules, prix unitaire), sinon ces valeurs restent figées de la
+    // dernière fois où une batterie était sélectionnée et se retrouvent à tort
+    // dans le devis (qty=2, prix plein) malgré "Sans batterie" affiché.
+    nbBat = 0; batTot = 0; batUtl = 0; batModel = null;
+    window.__batUnitPrice = 0;
   }
 
   // Affichage
@@ -4160,6 +4201,8 @@ function calculate(){
     document.getElementById('r-bat-lbl').textContent = (batModel?batModel.nom:'–')+' × '+nbBat+' = '+batTot.toFixed(1)+' kWh';
     document.getElementById('r-bat-tot').textContent = batTot.toFixed(1)+' kWh';
     document.getElementById('r-bat-utl').textContent = batUtl.toFixed(1)+' kWh';
+  } else {
+    document.getElementById('r-nbat').innerHTML = '0 <span class="big-unit" id="r-bat-unit">'+t('modules_unit')+'</span>';
   }
 
   const g=id=>document.getElementById(id).value||'–';
@@ -4302,6 +4345,7 @@ const TRANS = {
     lbl_tel:        "Téléphone client",
     lbl_region:     "Localité / Région",
     lbl_reseau:     "Type de réseau",
+    lbl_secours:    "Secours disponible sur site ?",
     lbl_batmode:    "Mode batterie",
     lbl_autonomie:  "Autonomie (nuits)",
     lbl_panneau:    "Panneau solaire",
@@ -4453,6 +4497,7 @@ const TRANS = {
     lbl_tel:        "Client Phone",
     lbl_region:     "Location / Region",
     lbl_reseau:     "Network Type",
+    lbl_secours:    "Backup available on-site?",
     lbl_batmode:    "Battery Mode",
     lbl_autonomie:  "Autonomy (nights)",
     lbl_panneau:    "Solar Panel",
@@ -4604,6 +4649,7 @@ const TRANS = {
     lbl_tel:        "هاتف العميل",
     lbl_region:     "المنطقة / المدينة",
     lbl_reseau:     "نوع الشبكة",
+    lbl_secours:    "هل يوجد احتياط في الموقع؟",
     lbl_batmode:    "وضع البطارية",
     lbl_autonomie:  "الاستقلالية (ليالٍ)",
     lbl_panneau:    "اللوح الشمسي",
@@ -4825,7 +4871,7 @@ const APP_TRANS_AR = {
   "Soudure inverter 160A":"لحام إنفرتر 160 أمبير",
 };
 
-let currentLang = 'en';
+let currentLang = 'fr';
 
 function t(key){ return (TRANS[currentLang]||TRANS.fr)[key] || TRANS.fr[key] || key; }
 
@@ -4873,8 +4919,8 @@ function applyLang(){
   // Labels champs client
   const labels = document.querySelectorAll('.pfield label');
   const labelKeys = ['lbl_dossier','lbl_client','lbl_adresse','lbl_tel','lbl_date','lbl_region',
-                     'lbl_reseau','lbl_batmode','lbl_autonomie','lbl_panneau',
-                     'lbl_source','lbl_panparstring','lbl_combine','lbl_distance','lbl_rangees','lbl_rails','lbl_avec_panneaux'];
+                     'lbl_reseau','lbl_secours','lbl_batmode','lbl_autonomie','lbl_panneau',
+                     'lbl_panparstring','lbl_combine','lbl_distance','lbl_rangees','lbl_rails','lbl_avec_panneaux'];
   labels.forEach((lbl, i) => {
     if(labelKeys[i]){
       // Preserve the AUTO badge if present
@@ -5083,6 +5129,7 @@ function setLang(lang){
     if(btn) btn.style.opacity = l === lang ? '1' : '0.5';
   });
   applyLang();
+  calculate(); // relance le calcul pour retraduire aussi tout le contenu généré dynamiquement (avertissements, statistiques...)
   // Force translate static labels that may be missed
   const omt = document.getElementById('ond-mode-text');
   if(omt) omt.textContent = t('ond_mode_lbl');
@@ -5562,6 +5609,7 @@ function renderDossierList(){
 window.addEventListener('DOMContentLoaded', function(){
   buildCatSelect();
   onBatModeChange();
+  applyLang(); // synchronise les champs fixes avec la langue par défaut dès le chargement
   calculate();
   onOndModeChange();
   onBatSourceChange();
