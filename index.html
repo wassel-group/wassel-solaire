@@ -411,7 +411,7 @@ body.ar .sum-lbl { font-size:18px !important; }
           <div class="pfield"><label>Mode batterie</label>
             <select id="p-bat-mode" onchange="onBatModeChange()">
               <option value="none">⚡ Sans batterie</option>
-              <option value="lv" selected>🔋 Avec batterie LV (48V)</option>
+              <option value="lv" selected>🔋 Avec batterie LV (52V)</option>
               <option value="hv">🔋 Avec batterie HV (100-550V)</option>
             </select>
           </div>
@@ -548,8 +548,8 @@ body.ar .sum-lbl { font-size:18px !important; }
           <label><span id="bat-model-lbl2">Choix du Stock</span><span id="bat-auto-badge" style="color:#22c55e;font-weight:700;margin-left:6px;">⚡</span></label>
           <!-- Stock Wassel -->
           <select id="p-batkwh-stock" onchange="calculate()">
-            <optgroup label="── LV (48V) ──">
-              <option value="5.12|Deye SE-F5|48|232500" selected>5.12 kWh – SE-F5</option>
+            <optgroup label="── LV (52V) ──">
+              <option value="5.12|Deye SE-F5|48|248000" selected>5.12 kWh – SE-F5</option>
               <option value="5.12|Deye SE-F5 PLUS|48|255750">5.12 kWh – SE-F5 PLUS</option>
               <option value="12.0|Deye SE-F12|48|511500">12.0 kWh – SE-F12</option>
               <option value="16.0|Deye SE-F16|48|612250">16.0 kWh – SE-F16</option>
@@ -563,7 +563,7 @@ body.ar .sum-lbl { font-size:18px !important; }
           <!-- Tous les modèles (caché par défaut) -->
           <select id="p-batkwh" onchange="calculate()" style="display:none;">
             <optgroup label="── DEYE LV ──">
-              <option value="5.12|Deye SE-F5|48|232500">5.12 kWh – SE-F5</option>
+              <option value="5.12|Deye SE-F5|48|248000">5.12 kWh – SE-F5</option>
               <option value="5.12|Deye SE-F5 PLUS|48|255750">5.12 kWh – SE-F5 PLUS</option>
               <option value="12.0|Deye SE-F12|48|511500">12.0 kWh – SE-F12</option>
               <option value="16.0|Deye SE-F16|48|612250">16.0 kWh – SE-F16</option>
@@ -713,16 +713,6 @@ body.ar .sum-lbl { font-size:18px !important; }
 
   <!-- ══ DROITE ══ -->
   <div class="results-panel">
-    <div id="marge-toggle" style="display:flex;gap:8px;margin-bottom:8px;font-size:11px;">
-      <label id="marge-std-box" style="flex:1;display:flex;align-items:center;gap:5px;border:1.5px solid #16a34a;border-radius:6px;padding:6px 8px;cursor:pointer;background:#f0fdf4;">
-        <input type="radio" name="marge-secu" id="marge-std" value="1.20" checked onchange="updateMargeUI()" style="cursor:pointer;">
-        <span id="lbl-marge-std">Standard – marge de sécurité 20% (recommandé)</span>
-      </label>
-      <label id="marge-eco-box" style="flex:1;display:flex;align-items:center;gap:5px;border:1.5px solid #ccc;border-radius:6px;padding:6px 8px;cursor:pointer;">
-        <input type="radio" name="marge-secu" id="marge-eco" value="1.0" onchange="updateMargeUI()" style="cursor:pointer;">
-        <span id="lbl-marge-eco">Économique – dimensionnement strict, sans marge</span>
-      </label>
-    </div>
     <button class="btn-calc" onclick="calculate()">⚡ CALCULER LE DIMENSIONNEMENT</button>
 
     <!-- Consommation -->
@@ -2404,8 +2394,8 @@ function onBatModeChange(){
   document.getElementById('bat-info').style.display        = on ? '' : 'none';
 
   // ── AMÉLIORATION : cohérence batterie <-> onduleur ──
-  // Si le mode batterie est LV, l'onduleur sélectionné est forcément LV (48V) :
-  // on ne propose donc que des batteries 48V. Si le mode est HV, idem côté 512V.
+  // Si le mode batterie est LV, l'onduleur sélectionné est forcément LV (52V) :
+  // on ne propose donc que des batteries 52V. Si le mode est HV, idem côté 512V.
   // La tension de chaque batterie est encodée dans la 3ᵉ partie de sa valeur (kwh|nom|volt).
   ['p-batkwh-stock','p-batkwh'].forEach(id=>{
     const sel = document.getElementById(id);
@@ -2581,11 +2571,11 @@ function computeAccessoiresDetail(nbPan, distanceM, panParString, stringsCombine
   // Support de fixation : plus un ratio fixe par panneau, mais la somme des crochets de liaison
   // + crochets de fixation (chaque crochet, qu'il soit central ou de fin, se fixe sur un support)
   // — confirmé par Farouk le 29/08/2026, remplace l'ancien ratio de 6/panneau.
-  const SUPPORT_TOITURE_INFO = { key:'support_toiture', nom:'Support de fixation sur toiture tôle/bac acier', pu: 1395 };
+  const SUPPORT_TOITURE_INFO = { key:'support_toiture', nom:'Support de fixation sur toiture tôle/bac acier', pu: 1550 }; // prix mis à jour le 29/08/2026 (catalogue Wassel), auparavant 1395
   // Vis autoperceuse : plus un ratio fixe par panneau, mais 8 vis par support de fixation
   // (confirmé par Farouk le 05/08/2026 — remplace l'ancien ratio de 64/panneau, non documenté).
   const VIS_PAR_SUPPORT = 6; // corrigé le 29/08/2026 par Farouk (auparavant 8)
-  const VIS_INFO = { key:'vis', nom:'Vis autoperceuse fine pour tôle 5×5×38mm', pu: 47 };
+  const VIS_INFO = { key:'vis', nom:'Vis autoperceuse fine pour tôle 5×5×38mm', pu: 50 }; // prix confirmé par Farouk le 29/08/2026, auparavant 47
   const PROFILE_6M = { key:'profile_6m', nom:'Profilé métallique pour supports, 6m', metresParPanneau: 4.8, longueurUnite: 6, pu: 6200 };
   const MARGE_ACCESSOIRES = 1.10; // 10% pour chutes/raccords/imprévus (confirmé par Farouk)
 
@@ -3328,7 +3318,7 @@ function printDevis(existingWin, langOverride, special){
   const TVA = 10;
   const isRTL = L.dir === 'rtl';
   const fontFamily = isRTL ? "'Sakkal Majalla','Traditional Arabic',Arial" : "Arial";
-  const panDefaultPu = 41800;
+  const panDefaultPu = 41075; // prix mis à jour le 29/08/2026 (catalogue Wassel), auparavant 41800
   const ondDefaultPu = window.__ondUnitPrice||450000;
   const batDefaultPu = window.__batUnitPrice||280000;
 
@@ -3363,7 +3353,7 @@ function printDevis(existingWin, langOverride, special){
     { desc: '', qty: 1, pu: 0, remise: 0 },
     { desc: '', qty: 1, pu: 0, remise: 0 },
   ] : [
-    { desc: L.desc_panel+' '+wPan+'W'+(REF_PANEL[wPan] ? ' ('+REF_PANEL[wPan]+')' : ''), qty: nbPan,  pu: 41800,  remise: 0, role:'panel' },
+    { desc: L.desc_panel+' '+wPan+'W'+(REF_PANEL[wPan] ? ' ('+REF_PANEL[wPan]+')' : ''), qty: nbPan,  pu: 41075,  remise: 0, role:'panel' },
     { desc: L.lbl_ond_prefix+' '+(ondModel||L.desc_ond)+(REF_ONDULEUR[ondModel] ? ' ('+REF_ONDULEUR[ondModel]+')' : ''),      qty: nbOnd,  pu: (window.__ondUnitPrice||450000), remise: 0, role:'onduleur' },
     { desc: L.lbl_bat_prefix+' '+(batModel||L.desc_bat),      qty: nbBat,  pu: (window.__batUnitPrice||280000), remise: 0, role:'batterie' },
     { desc: L.desc_mdo,                qty: 1,      pu: 15000 * nbPan, remise: 0, role:'labour' },
@@ -3553,7 +3543,7 @@ function printDevis(existingWin, langOverride, special){
   <input type="text" id="extra-search" placeholder="🔍 Rechercher un article (ex: MC4, câble, ATS...)" oninput="filterExtraCatalog(this.value)" style="width:100%;max-width:420px;padding:6px;border:1px solid #ccc;border-radius:5px;font-size:11px;margin-bottom:6px;display:block;">
   <select id="extra-catalog" style="padding:6px;border:1px solid #ccc;border-radius:5px;font-size:11px;max-width:420px;">
     <optgroup label="Panneaux solaires">
-      <option value="Panneau solaire Jinko N-Type Bifacial 720W (33060201004)|41800">Panneau Jinko N-Type Bifacial 720W — 41 800 FDJ</option>
+      <option value="Panneau solaire Jinko N-Type Bifacial 720W (33060201004)|41075">Panneau Jinko N-Type Bifacial 720W — 41 075 FDJ</option>
     </optgroup>
     <optgroup label="Onduleurs DEYE">
       <option value="Onduleur SUN-6K-OG01LP1-EU-AM2 (33060103010)|152675">SUN-6K-OG01LP1-EU-AM2 — 152 675 FDJ</option>
@@ -3563,8 +3553,8 @@ function printDevis(existingWin, langOverride, special){
       <option value="Onduleur SUN-20K-SG01HP3-EU-AM2 (33060103004)|558000">SUN-20K-SG01HP3-EU-AM2 — 558 000 FDJ</option>
       <option value="Onduleur SUN-20K-SG05LP3-EU-SM2 (33060103015)|575000">SUN-20K-SG05LP3-EU-SM2 — 575 000 FDJ</option>
       <option value="Onduleur SUN-12K-SG01HP3-EU-AM2 (33060103003)|401450">SUN-12K-SG01HP3-EU-AM2 — 401 450 FDJ</option>
-      <option value="Onduleur SUN-25K-SG01HP3-EU-AM3-25 (33060103017)|705250">SUN-25K-SG01HP3-EU-AM3-25 — 705 250 FDJ</option>
-      <option value="Onduleur SUN-30K-SG01HP3-EU-BM3 (33060103005)|1007500">SUN-30K-SG01HP3-EU-BM3 — 1 007 500 FDJ</option>
+      <option value="Onduleur SUN-25K-SG01HP3-EU-AM3-25 (33060103017)|612250">SUN-25K-SG01HP3-EU-AM3-25 — 612 250 FDJ</option>
+      <option value="Onduleur SUN-30K-SG01HP3-EU-BM3 (33060103005)|806000">SUN-30K-SG01HP3-EU-BM3 — 806 000 FDJ</option>
       <option value="Onduleur SUN-50K-SG01HP3-EU-BM4 (33060103006)|1433750">SUN-50K-SG01HP3-EU-BM4 — 1 433 750 FDJ</option>
       <option value="Onduleur SUN-80K-SG01HP3-EU (33060103007)|2131250">SUN-80K-SG01HP3-EU — 2 131 250 FDJ</option>
     </optgroup>
@@ -3590,7 +3580,7 @@ function printDevis(existingWin, langOverride, special){
       <option value="Pièce détachée batterie BOS-B-PDU-2 (accessoires) (prix à confirmer)|0">BOS-B-PDU-2 (accessoires) — prix en attente</option>
     </optgroup>
     <optgroup label="Batteries Deye">
-      <option value="Batterie Deye SE-F5 (33060602001)|232500">Deye SE-F5 (5.12kWh) — 232 500 FDJ</option>
+      <option value="Batterie Deye SE-F5 (33060602001)|248000">Deye SE-F5 (5.12kWh) — 248 000 FDJ</option>
       <option value="Batterie Deye SE-F5 PLUS (33060602002)|255750">Deye SE-F5 PLUS (5.12kWh) — 255 750 FDJ</option>
       <option value="Batterie Deye SE-F12 (33060602003)|511500">Deye SE-F12 (12kWh) — 511 500 FDJ</option>
       <option value="Batterie Deye SE-F16 (33060602004)|612250">Deye SE-F16 (16kWh) — 612 250 FDJ</option>
@@ -3603,9 +3593,9 @@ function printDevis(existingWin, langOverride, special){
       <option value="Boîtier de contrôle BOS-G-PDU-2 (33060304003)|240250">Boîtier de contrôle BOS-G-PDU-2 — 240 250 FDJ</option>
       <option value="Boîtier de contrôle BOS-W-PDU-2 (33060304001)|240250">Boîtier de contrôle BOS-W-PDU-2 — 240 250 FDJ</option>
       <option value="Boîtier de contrôle BOS-B-PDU-2 (33060304005)|511500">Boîtier de contrôle BOS-B-PDU-2 — 511 500 FDJ</option>
-      <option value="Prise électrique intelligente pour batteries solaires (33060501036)|16275">Prise intelligente DEYE SMART PLUG — 16 275 FDJ</option>
-      <option value="Dispositif sans fil pour relier l'onduleur au tableau électrique (33060501033)|23250">Wireless CT (onduleur → tableau) — 23 250 FDJ</option>
-      <option value="Chargeur de véhicule électrique 11 kW (33060501034)|93000">Chargeur véhicule électrique 11kW — 93 000 FDJ</option>
+      <option value="Prise électrique intelligente pour batteries solaires (33060501036)|17050">Prise intelligente DEYE SMART PLUG — 17 050 FDJ</option>
+      <option value="Dispositif sans fil pour relier l'onduleur au tableau électrique (33060501033)|93000">Wireless CT (onduleur → tableau) — 93 000 FDJ</option>
+      <option value="Chargeur de véhicule électrique 11 kW (33060501034)|116250">Chargeur véhicule électrique 11kW — 116 250 FDJ</option>
       <option value="Chargeur de véhicule électrique 22 kW (33060501035)|116250">Chargeur véhicule électrique 22kW — 116 250 FDJ</option>
     </optgroup>
     <optgroup label="Onduleur / Protections / PV">
@@ -3844,14 +3834,6 @@ function printPdf(){
   setTimeout(()=>{ document.title = originalTitle; }, 500);
 }
 
-function updateMargeUI(){
-  const std = document.getElementById('marge-std-box');
-  const eco = document.getElementById('marge-eco-box');
-  const isStd = document.getElementById('marge-std').checked;
-  if(std) { std.style.border = isStd ? '1.5px solid #16a34a' : '1.5px solid #ccc'; std.style.background = isStd ? '#f0fdf4' : '#fff'; }
-  if(eco) { eco.style.border = !isStd ? '1.5px solid #16a34a' : '1.5px solid #ccc'; eco.style.background = !isStd ? '#f0fdf4' : '#fff'; }
-}
-
 // ── Numéros de série / références internes Wassel (onduleurs et batteries) ──
 // Source : "LISTE_PRICE_ARTICLE_SOLAR_wassel.pdf". Seuls les modèles présents dans ce
 // document ont une référence ; les autres n'en affichent aucune. Portée globale (script)
@@ -3908,14 +3890,13 @@ function calculate(){
   const consoTotKwh   = totalWh / 1000;
   const consoJourKwh  = whJour / 1000;
   const consoNuitKwh  = whNuit / 1000;
-  // Besoin total panneaux = (conso jour + conso nuit) / rendement système × marge 20%
+  // Besoin total panneaux = (conso jour + conso nuit) / rendement système, SANS marge supplémentaire
   // RENDEMENT = 0.80 appliqué UNE SEULE FOIS (rendement global système)
   // La profondeur de décharge batterie (DoD) est gérée séparément dans le calcul batterie
-  // ── Marge de sécurité sélectionnée (Standard 1.20 / Économique 1.0) ──
-  const margeSecu = parseFloat((document.querySelector('input[name="marge-secu"]:checked')||{}).value) || 1.20;
+  // Méthode officielle Wassel (infographie "Guide complet de dimensionnement", validée par la direction le 27/09/2026)
   const besoinTotal   = hasBat
-    ? ((consoJourKwh + consoNuitKwh) / RENDEMENT) * margeSecu
-    : (consoTotKwh / RENDEMENT) * margeSecu;
+    ? (consoJourKwh + consoNuitKwh) / RENDEMENT
+    : consoTotKwh / RENDEMENT;
   const consoBatKwh   = consoNuitKwh; // pour compatibilité avec l'affichage autonomie
   const kwcNec        = besoinTotal / hSol;
   let nbPan = sansPanneaux ? 0 : Math.ceil(kwcNec * 1000 / wPan);
@@ -3937,11 +3918,17 @@ function calculate(){
   // ── Recommandation onduleur DEYE précise ──
   const reseau  = document.getElementById('p-reseau').value;   // mono / tri
   const batMode = document.getElementById('p-bat-mode').value; // none / lv / hv
-  // ── CORRECTION 2 : Onduleur ──
-  // Puissance minimale requise = MAX(kWc panneaux × 1.1 , puissance simultanée × 1.25)
-  const kwPanneaux   = kwcInst * 1.10;
-  const kwSimulBrut  = (pcreteSimul / 1000) * 1.25;
-  const kw           = Math.max(kwPanneaux, kwSimulBrut);
+  // Onduleur — méthode officielle Wassel (infographie du 27/09/2026).
+  // Puissance AC minimale requise = puissance simultanée × 1.5 (SF).
+  // La compatibilité PV (kWc panneaux vs puissance PV max réelle de l'onduleur) est vérifiée
+  // SÉPARÉMENT, contre la vraie limite du modèle (maxPvKw) quand elle est connue — voir plus bas.
+  // Historique : un critère "kWc panneaux × 1.10" imposé sur la puissance AC a été essayé le
+  // 28/09/2026 suite au dossier 2026-052 (10K sous-dimensionné en DC), puis retiré le même jour
+  // car il gonflait à tort l'exigence AC (ex. 18,72kWc → exige >20kW AC) et forçait plusieurs
+  // onduleurs en parallèle inutilement (dossier 2026-052 bis, AMRAN TAHER) alors qu'un seul
+  // modèle suffisait déjà côté PV réel (maxPvKw vérifié). La vraie protection est maxPvKw.
+  const kwSimulBrut  = (pcreteSimul / 1000) * 1.5;
+  const kw           = kwSimulBrut;
   // → sélection du modèle immédiatement SUPÉRIEUR (pas égal, supérieur strict)
 
   // Calcul nb MPPT nécessaires (1 MPPT par tranche de 4kWc recommandé)
@@ -3985,22 +3972,22 @@ function calculate(){
     {id:'SUN-5K-SG04LP3-EU',  kw:5,  phase:'tri',  bat:'lv', mppt:2},
     {id:'SUN-6K-SG04LP3-AU',  kw:6,  phase:'tri',  bat:'lv', mppt:2},
     {id:'SUN-8K-SG04LP3-EU',  kw:8,  phase:'tri',  bat:'lv', mppt:2},
-    {id:'SUN-10K-SG04LP3-EU', kw:10, phase:'tri',  bat:'lv', mppt:2},
+    {id:'SUN-10K-SG04LP3-EU', kw:10, phase:'tri',  bat:'lv', mppt:2, maxPvKw:15}, // Max PV Input Power = 15000W (≠ Max. PV Access Power = 20000W, à ne pas confondre) — vérifié le 28/09/2026 sur fiche Deye (pretapower.com) et recoupé avec la base DEYE_DB existante du calculateur (maxPV:15000)
     {id:'SUN-12K-SG04LP3-EU', kw:12, phase:'tri',  bat:'lv', mppt:2},
     {id:'SUN-5K-SG05LP3-EU',  kw:5,  phase:'tri',  bat:'lv', mppt:2},
     {id:'SUN-8K-SG05LP3-EU',  kw:8,  phase:'tri',  bat:'lv', mppt:2},
     {id:'SUN-10K-SG05LP3-EU', kw:10, phase:'tri',  bat:'lv', mppt:2},
     {id:'SUN-12K-SG05LP3-EU', kw:12, phase:'tri',  bat:'lv', mppt:2},
     {id:'SUN-16K-SG05LP3-EU', kw:16, phase:'tri',  bat:'lv', mppt:2},
-    {id:'SUN-20K-SG05LP3-EU-SM2', kw:20, phase:'tri',  bat:'lv', mppt:2, prix:575000}, // prix corrigé le 27/08/2026 par Farouk (auparavant 891250)
+    {id:'SUN-20K-SG05LP3-EU-SM2', kw:20, phase:'tri',  bat:'lv', mppt:2, prix:575000, maxPvKw:30}, // prix corrigé le 27/08/2026 par Farouk (auparavant 891250) — maxPvKw=30 (2×15kW/MPPT) vérifié sur datasheet Deye SUN-14-20K-SG05LP3-EU-SM2 le 28/09/2026
     // Triphasé HV — ✅ Stock Wassel (à privilégier par la sélection automatique)
     {id:'SUN-12K-SG01HP3-EU-AM2', kw:12, phase:'tri', bat:'hv', mppt:2, stock:false, prix:401450}, // prix confirmé par Farouk le 27/08/2026
     {id:'SUN-20K-SG01HP3-EU-AM2', kw:20, phase:'tri', bat:'hv', mppt:3, stock:true, prix:558000}, // reclassé HV et prix corrigé le 27/08/2026 par Farouk (auparavant classé LV à 891250, erreur du 26/07/2026)
-    {id:'SUN-30K-SG01HP3-EU-BM3', kw:30, phase:'tri', bat:'hv', mppt:3, stock:true, prix:1007500},
+    {id:'SUN-30K-SG01HP3-EU-BM3', kw:30, phase:'tri', bat:'hv', mppt:3, stock:true, prix:806000}, // prix mis à jour le 29/08/2026 (catalogue Wassel), auparavant 1007500
     {id:'SUN-50K-SG01HP3-EU-BM4', kw:50, phase:'tri', bat:'hv', mppt:4, stock:true, prix:1433750},
     {id:'SUN-80K-SG01HP3-EU',     kw:80, phase:'tri', bat:'hv', mppt:6, stock:true, prix:2131250},
     // ── NOUVEAU STOCK IMPORTÉ (liste prix juillet 2026) ──
-    {id:'SUN-25K-SG01HP3-EU-AM3-25', kw:25, phase:'tri', bat:'hv', mppt:3, stock:true, prix:705250}, // MPPT à confirmer (aligné sur palier 25kW de la famille HP3)
+    {id:'SUN-25K-SG01HP3-EU-AM3-25', kw:25, phase:'tri', bat:'hv', mppt:3, stock:true, prix:612250}, // prix mis à jour le 29/08/2026 (catalogue Wassel), auparavant 705250 — MPPT à confirmer
     {id:'SUN-6K-OG01LP1-EU-AM2',     kw:6,  phase:'mono', bat:'lv', mppt:2, stock:true, prix:152675}, // MPPT à confirmer — préfixe "OG01" inhabituel (vs "SG01"), à vérifier que ce n'est pas une coquille
     // Triphasé HV — autres modèles (hors Stock Wassel)
     {id:'SUN-5K-SG01HP3-EU',  kw:5,  phase:'tri',  bat:'hv', mppt:2},
@@ -4042,6 +4029,12 @@ function calculate(){
     if(problemes.length) ondFallbackNote = t('manual_incompat_prefix') + ' ' + problemes.join(' — ');
   } else {
   // Modèle immédiatement supérieur : kw STRICTEMENT > besoin (pas égal)
+  // mpptNec (1 MPPT recommandé / 4kWc) est une recommandation générique de répartition
+  // des chaînes, PAS une limite électrique réelle — elle ne doit jamais exclure à elle
+  // seule un modèle par ailleurs adapté en puissance. On cherche donc d'abord un modèle
+  // qui respecte aussi cette recommandation (idéal) ; si aucun n'existe dans la gamme
+  // réseau/batterie demandée, on retombe sur le critère de puissance seul, et on vérifie
+  // ensuite la vraie limite électrique (maxPvKw, quand elle est connue pour ce modèle).
   const candidats = DEYE_MODELS.filter(m =>
     m.phase === reseau &&
     m.bat   === batFilter &&
@@ -4056,6 +4049,17 @@ function calculate(){
     m.mppt  >= mpptNec
   );
   listeCandidats = candidats.length > 0 ? candidats : candidatsFallback;
+
+  // Repli : aucun modèle de cette gamme réseau/batterie n'atteint le nombre de MPPT
+  // "recommandé" (mpptNec) — on reprend les mêmes modèles SANS ce critère générique,
+  // plutôt que de les exclure ou de sauter vers un modèle surdimensionné en gamme HV.
+  let mpptRelaxed = false;
+  if(listeCandidats.length === 0){
+    const candidatsNoMppt = DEYE_MODELS.filter(m => m.phase===reseau && m.bat===batFilter && m.kw > kw);
+    const candidatsNoMpptFallback = DEYE_MODELS.filter(m => m.phase===reseau && m.bat===batFilter && m.kw >= kw);
+    listeCandidats = candidatsNoMppt.length > 0 ? candidatsNoMppt : candidatsNoMpptFallback;
+    if(listeCandidats.length > 0) mpptRelaxed = true;
+  }
 
   // ── AMÉLIORATION : "Sans batterie" + Triphasé ──
   // Aucun modèle DEYE_MODELS n'a phase:'tri' + bat:'none'. Les onduleurs hybrides
@@ -4073,11 +4077,36 @@ function calculate(){
 
   // Prendre le modèle le plus adapté : priorité Stock Wassel, puis puissance minimale suffisante
   listeCandidats.sort((a,b) => (b.stock?1:0)-(a.stock?1:0) || a.kw - b.kw || a.mppt - b.mppt);
-  best = listeCandidats[0];
+
+  // Priorité de choix, parmi les candidats déjà triés par puissance AC croissante (stock d'abord) :
+  //   1) un modèle dont la puissance PV max est VÉRIFIÉE et suffisante (le plus sûr) ;
+  //   2) à défaut, un modèle sans donnée vérifiée (avertissement indicatif, à confirmer) ;
+  //   3) en dernier recours, un modèle dont la limite PV est vérifiée mais INSUFFISANTE
+  //      (avertissement de dépassement réel, cf. ond_pv_exceed).
+  // On préfère toujours un modèle plus gros mais VÉRIFIÉ plutôt qu'un modèle plus petit mais
+  // NON vérifié (décision Farouk du 28/09/2026, suite au dossier 2026-052 bis). Ceci remplace
+  // l'ancien critère "panneaux × 1.10" sur la puissance AC (retiré le même jour) qui gonflait à
+  // tort l'exigence AC au lieu de vérifier la vraie limite PV.
+  const verifiedOk   = listeCandidats.find(m => typeof m.maxPvKw === 'number' && m.maxPvKw >= kwcInst);
+  const unverified    = listeCandidats.find(m => typeof m.maxPvKw !== 'number');
+  best = verifiedOk || unverified || listeCandidats[0];
+
+  // Vérification de la VRAIE limite électrique (maxPvKw), quand elle est connue pour ce modèle.
+  if(best){
+    if(typeof best.maxPvKw === 'number'){
+      if(kwcInst > best.maxPvKw){
+        ondFallbackNote = (ondFallbackNote ? ondFallbackNote+' ' : '') + t('ond_pv_exceed').replace('{max}', best.maxPvKw);
+      }
+    } else if(mpptRelaxed){
+      // Pas de donnée vérifiée pour ce modèle : on garde la recommandation générique,
+      // mais formulée comme indicative et non comme une non-conformité constatée.
+      ondFallbackNote = (ondFallbackNote ? ondFallbackNote+' ' : '') + t('ond_mppt_indicatif');
+    }
+  }
   }
 
   // Libellé tension batterie associée
-  const batVoltLabel = (bf) => bf==='none' ? 'Sans bat' : (bf==='hv' ? 'HV ~512V' : 'LV 48V');
+  const batVoltLabel = (bf) => bf==='none' ? 'Sans bat' : (bf==='hv' ? 'HV ~512V' : 'LV 52V');
 
   // ── AMÉLIORATION : proposition multi-onduleurs en parallèle ──
   // Si aucun modèle seul ne couvre le besoin (kw > plus grand modèle dispo pour
@@ -4142,7 +4171,7 @@ function calculate(){
   let nbBat=0, batTot=0, batUtl=0, batModel=null, batKwh=4.8;
   if(hasBat){
     const consNuitKwh = whNuit / 1000;
-    const ebat = consNuitKwh * auto * margeSecu; // marge de sécurité sélectionnée (même bouton que les panneaux)
+    const ebat = consNuitKwh * auto; // sans marge supplémentaire (cf. méthode Wassel)
     // Batterie: p-batkwh-stock = Stock Wassel, p-batkwh = tous modèles
     // Si p-batkwh a une valeur sélectionnée (index > 0), elle prime sur le stock
     const batSrc   = document.getElementById('p-bat-source');
@@ -4227,7 +4256,8 @@ function calculate(){
   document.getElementById('rc-kwc').textContent  = kwcInst.toFixed(2)+' kWc';
   document.getElementById('rc-ond').textContent  = ond;
   // Détail dimensionnement onduleur
-  let detailOnd = t('simul_detail')+'='+kwSimulBrut.toFixed(2)+'kW | '+t('pan_detail')+'='+kwPanneaux.toFixed(2)+'kW → '+t('retenu')+': '+kw.toFixed(2)+'kW';
+  let detailOnd = t('simul_detail')+'='+kwSimulBrut.toFixed(2)+'kW → '+t('retenu')+': '+kw.toFixed(2)+'kW'
+    + (best && typeof best.maxPvKw === 'number' ? '  |  PV max '+best.maxPvKw+'kWc ('+kwcInst.toFixed(2)+'kWc installés)' : '');
   if(ondFallbackNote) detailOnd += '  |  ⚠️ ' + ondFallbackNote;
   const elOndDetail = document.getElementById('rc-ond-detail');
   if(elOndDetail) elOndDetail.textContent = detailOnd;
@@ -4374,7 +4404,7 @@ const TRANS = {
     reseau_mono:    "Monophasé (220V)",
     reseau_tri:     "Triphasé (230V)",
     batmode_none:   "⚡ Sans batterie",
-    batmode_lv:     "🔋 Avec batterie LV (48V)",
+    batmode_lv:     "🔋 Avec batterie LV (52V)",
     batmode_hv:     "🔋 Avec batterie HV (100-550V)",
     auto_nuit05:    "½ nuit", auto_nuit1:"1 nuit", auto_nuit15:"1.5 nuit",
     auto_nuit2:     "2 nuits", auto_nuit3:"3 nuits",
@@ -4454,10 +4484,10 @@ const TRANS = {
     ond_qty_lbl:    "Quantité onduleur(s)",
     ond_qty_single: "unité",
     ond_qty_plural: "unités",
-    lv_label:       "LV (48V)",
+    lv_label:       "LV (52V)",
     hv_label:       "HV (100-550V)",
-    simul_detail:   "Simul×1.25",
-    pan_detail:     "Pan×1.1",
+    simul_detail:   "Simul×1.5",
+    pan_detail:     "Pan×1.10",
     retenu:         "retenu",
     ond_fallback_hybride: "Onduleur hybride DEYE pouvant fonctionner sans batterie raccordée – à confirmer avec Wassel.",
     manual_incompat_prefix: "⚠️ Choix manuel incompatible :",
@@ -4470,6 +4500,8 @@ const TRANS = {
     ond_stock_badge: "Stock Wassel",
     ond_no_model: "Aucun modèle disponible – Contactez Wassel",
     ond_mppt_below: "Nombre de MPPT total inférieur à la recommandation (répartition des chaînes à valider).",
+    ond_mppt_indicatif: "Recommandation générale de répartition des chaînes (1 MPPT / 4kWc) non atteinte pour ce modèle — donnée de puissance PV max non vérifiée dans notre base pour ce modèle précis ; sans incidence si les chaînes restent dans les limites du modèle (à confirmer sur sa fiche technique Deye).",
+    ond_pv_exceed: "Puissance PV installée supérieure à la puissance PV maximale de cet onduleur ({max} kWc max, vérifié sur fiche technique Deye) — choisir un autre modèle ou réduire le nombre de panneaux.",
     bat_besoin:     "Besoin",
     bat_utile:      "utile",
     bat_total:      "total",
@@ -4527,7 +4559,7 @@ const TRANS = {
     reseau_mono:    "Single-phase (220V)",
     reseau_tri:     "Three-phase (230V)",
     batmode_none:   "⚡ Without battery",
-    batmode_lv:     "🔋 With LV battery (48V)",
+    batmode_lv:     "🔋 With LV battery (52V)",
     batmode_hv:     "🔋 With HV battery (100-550V)",
     auto_nuit05:    "½ night", auto_nuit1:"1 night", auto_nuit15:"1.5 nights",
     auto_nuit2:     "2 nights", auto_nuit3:"3 nights",
@@ -4589,10 +4621,10 @@ const TRANS = {
     ond_qty_lbl:    "Inverter quantity",
     ond_qty_single: "unit",
     ond_qty_plural: "units",
-    lv_label:       "Low Voltage LV (48V)",
+    lv_label:       "Low Voltage LV (52V)",
     hv_label:       "High Voltage HV (100-550V)",
-    simul_detail:   "Simul×1.25",
-    pan_detail:     "Pan×1.1",
+    simul_detail:   "Simul×1.5",
+    pan_detail:     "Pan×1.10",
     retenu:         "retained",
     ond_fallback_hybride: "DEYE hybrid inverter that can operate without a battery connected – to confirm with Wassel.",
     manual_incompat_prefix: "⚠️ Incompatible manual selection:",
@@ -4605,6 +4637,8 @@ const TRANS = {
     ond_stock_badge: "Wassel Stock",
     ond_no_model: "No model available – Contact Wassel",
     ond_mppt_below: "Total MPPT count below the recommendation (string distribution to be validated).",
+    ond_mppt_indicatif: "General string-distribution guideline (1 MPPT / 4kWc) not met for this model — max PV power not verified in our database for this exact model; no real issue as long as strings stay within the model's limits (confirm on its Deye datasheet).",
+    ond_pv_exceed: "Installed PV power exceeds this inverter's maximum PV power ({max} kWc max, verified on Deye datasheet) — choose another model or reduce the number of panels.",
     bat_besoin:     "Need",
     bat_utile:      "useful",
     bat_total:      "total",
@@ -4759,10 +4793,10 @@ const TRANS = {
     ond_qty_lbl:    "عدد إنفرتر",
     ond_qty_single: "وحدة",
     ond_qty_plural: "وحدات",
-    lv_label:       "جهد منخفض LV (48V)",
+    lv_label:       "جهد منخفض LV (52V)",
     hv_label:       "جهد عالي HV (100-550V)",
-    simul_detail:   "متزامن×1.25",
-    pan_detail:     "ألواح×1.1",
+    simul_detail:   "متزامن×1.5",
+    pan_detail:     "ألواح×1.10",
     retenu:         "المحتجز",
     ond_fallback_hybride: "عاكس Deye الهجين يمكنه العمل بدون بطارية متصلة – يجب التأكيد مع واصل.",
     manual_incompat_prefix: "⚠️ الاختيار اليدوي غير متوافق:",
@@ -4775,6 +4809,8 @@ const TRANS = {
     ond_stock_badge: "مخزون واصل",
     ond_no_model: "لا يوجد طراز متاح – يرجى التواصل مع واصل",
     ond_mppt_below: "عدد منافذ MPPT الإجمالي أقل من الموصى به (يجب التحقق من توزيع السلاسل).",
+    ond_mppt_indicatif: "التوصية العامة بتوزيع السلاسل (1 MPPT لكل 4 كيلوواط) غير محققة لهذا الطراز — قدرة الدخول الشمسية القصوى غير مؤكدة في قاعدة بياناتنا لهذا الطراز بالذات؛ لا مشكلة حقيقية طالما بقيت السلاسل ضمن حدود الطراز (يُرجى التأكد من ورقة بيانات Deye).",
+    ond_pv_exceed: "قدرة الألواح الشمسية المركبة تتجاوز الحد الأقصى لهذا العاكس ({max} كيلوواط، تم التحقق من ورقة بيانات Deye) — اختر طرازاً آخر أو قلل عدد الألواح.",
     bat_besoin:     "الحاجة",
     bat_utile:      "مفيد",
     bat_total:      "المجموع",
@@ -5102,12 +5138,6 @@ function applyLang(){
   // Bouton imprimer
   const btnPrint = document.querySelector('.btn-print');
   if(btnPrint) btnPrint.textContent = t('btn_print');
-
-  // Libellés du toggle marge de sécurité
-  const lblStd = document.getElementById('lbl-marge-std');
-  const lblEco = document.getElementById('lbl-marge-eco');
-  if(lblStd) lblStd.textContent = t('marge_std');
-  if(lblEco) lblEco.textContent = t('marge_eco');
 
   const lblOndQtyManual = document.getElementById('lbl-ond-qty-manual');
   if(lblOndQtyManual) lblOndQtyManual.textContent = t('ond_qty_lbl');
